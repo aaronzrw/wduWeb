@@ -1,0 +1,791 @@
+html,
+body {
+	font-family: Edo, TarrgetLaser, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+			'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+			sans-serif;
+	overflow: hidden;
+}
+a {
+  text-decoration: none;
+}
+
+.mainView {
+  /* margin: 65px auto 0px; */
+  height: 100% !important;
+  max-width: calc(100% - 73px) !important;
+  margin-left: 73px;
+	background-Color: rgba(0, 0, 0);
+	position: relative;
+}
+
+.nav{
+	height: 65px;
+	width: 1920px;
+}
+.nav-container {
+  margin: auto;
+}
+.nav-container svg {
+  color: #fff;
+}
+
+.Loading{
+	transform-origin: center;
+	animation: loadingAnim 3s ease infinite;
+}
+@keyframes loadingAnim {
+	0% {
+		transform: translate(0, -10%) rotateY(0);
+	}
+	50% {
+		transform: translate(0, 10%) rotateY(360deg);
+	}
+	100% {
+		transform: translate(0, -10%) rotateY(720deg);
+	}
+}
+
+/* Poll Countdown */
+.countdown-wrapper {
+	position: relative;
+	display: flex;
+	font-family: "Edo";
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+	animation: countDownFadeIn 3s ease;
+}
+@keyframes countDownFadeIn {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 100;
+	}
+}
+
+.countdown-item {
+	font-size: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	line-height: 30px;
+	width: 100px;
+	height: 100px;
+}
+
+.countdown-item span {
+	font-family: "Edo";
+	font-size: 20px;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.countdown-BG{
+	height: 5px;
+	width: 100%;
+	position: absolute;
+	top: 37px;
+	/* left: 50%;
+	transform: translate(-50%, -50%); */
+	background-color: rgba(255, 255, 255, 0.31);
+	font-family: Edo;
+	/* transform-origin: center; */
+	animation: 3s cubic-bezier(0.06, 0.68, 0.03, 1.25) 1s countdown-BGGrow;
+	animation-fill-mode: forwards;
+	transform: scaleX(0)
+}
+@keyframes countdown-BGGrow {
+	0% {
+		transform: scaleX(0);
+	}
+	100% {
+		transform: scaleX(1);
+	}
+}
+
+/* Vote */
+.topVote{
+	animation: topVoteAnim 3s ease infinite;
+}
+@keyframes topVoteAnim {
+	0% {
+		transform: translate(0, -75px);
+	}
+	50% {
+		transform: translate(0, -25px);
+	}
+	100% {
+		transform: translate(0, -75px);
+	}
+}
+
+.topVoteImg{
+	height: 100%;
+	width: 100%;
+	clip-path: circle(50%);
+	transform-origin: center;
+	animation: topVoteImgSpin 3s ease infinite;
+}
+@keyframes topVoteImgSpin {
+	0% {
+		transform: rotateY(0);
+	}
+	100% {
+		transform: rotateY(720deg);
+	}
+}
+
+.tradeWaifu{
+	height: 100%;
+	width: 100%;
+	clip-path: circle(50%);
+	background-color: gold;
+	transform-origin: center;
+	transform: scale(0);
+	transition: transform 250ms cubic-bezier(0.4, 0.0, 0.2, 1)
+}
+.tradeWaifuSelected{
+	transform: scale(.75);
+}
+
+.growBackDropIn{
+	height:100%;
+	width: 100%;
+    animation: growBDIn .25s;
+}
+.growCardSectionIn{
+	height:100%;
+	width: 100%;
+    animation: growBDIn .5s;
+}
+.growBackDropOut{
+	height:100%;
+	width: 100%;
+    animation: growBDOut .5s;
+}
+.growCardSectionOut{
+	height:100%;
+	width: 100%;
+    animation: growBDOut .25s;
+}
+@keyframes growBDIn {
+	0%{
+		transform: scale(0);
+		-webkit-transform: scale(0);
+	}
+	100% {
+		transform: scale(1);
+		-webkit-transform: scale(1);
+	}
+}
+@keyframes growBDOut {
+	0%{
+		transform: scale(1);
+		-webkit-transform: scale(1);
+	}
+	100% {
+		transform: scale(0);
+		-webkit-transform: scale(0);
+	}
+}
+
+.cardDetails{
+	height: 100%;
+	width: 100%;
+    transform: scalex(0);
+	-webkit-transform: scaleX(0);
+	transform-origin: 0% 50%;
+    animation: cdSlideIn .5s forwards;
+	animation-delay: .25s;
+	border-radius: 0px 4px 4px 0px;
+}
+
+@keyframes cdSlideIn {
+	100% {
+		transform: scalex(1);
+		-webkit-transform: scaleX(1);
+	}
+}
+
+@font-face {
+  font-family: 'Edo';
+  src: local('Edo'), local('Edo'), url(./media/fonts/edo.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'TarrgetLaser';
+  src: local('TarrgetLaser'), local('TarrgetLaser'), url(./media/fonts/tarrgetlaser.ttf) format('truetype');
+}
+
+/* Home */
+.trashRank {
+	background: linear-gradient(90deg, #ffffff50, #ff0000, #ffffff50);
+	background-size: 400% 400%;
+	animation: rankGradient 10s ease infinite;
+}
+.bronzeRank {
+	background: linear-gradient(90deg, #CD7F3250, #835220, #CD7F3250);
+	background-size: 400% 400%;
+	animation: rankGradient 10s ease infinite;
+}
+.silverRank {
+	background: linear-gradient(90deg, rgba(123, 121, 121, 0.5), #ffffff, rgba(123, 121, 121, 0.5));
+	background-size: 400% 400%;
+	animation: rankGradient 10s ease infinite;
+}
+.goldRank {
+	background: linear-gradient(90deg, #ffd70050, #b29600 , #ffd70050 );
+	background-size: 400% 400%;
+	animation: rankGradient 10s ease infinite;
+}
+
+@keyframes rankGradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+/* SearchSeries */
+.seriesBackground{
+	height: 100%;
+	width: 100%;
+	clip-path: inset(25% 0% 25% 0%);
+	position: absolute;
+	z-index: -1;
+	transition: transform 1s;
+	transform-origin: center;
+	animation: seriresBG 1s;
+	background-color: black;
+}
+@keyframes seriresBG{
+	0%{
+		transform: scaley(0);
+	}
+	100%{
+		transform: scaley(1);
+	}
+}
+
+/* Card Borders */
+
+.gradient-border {
+	--borderWidth: 2px;
+	background: transparent;
+	position: relative;
+	border-radius: var(--borderWidth);
+}
+.gradient-border:after {
+	content: '';
+	position: absolute;
+	top: calc(-1 * var(--borderWidth));
+	left: calc(-1 * var(--borderWidth));
+	height: calc(100% + var(--borderWidth) * 2);
+	width: calc(100% + var(--borderWidth) * 2);
+	background: -moz-linear-gradient(bottom,  rgba(48,255,144,1) 0%, rgba(237,45,237,1) 25%, rgba(201,152,38,1) 50%, rgba(48,255,230,1) 75%, rgba(48,255,144,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, top, right bottom, color-stop(0%,rgba(48,255,144,1)), color-stop(25%,rgba(237,45,237,1)), color-stop(50%,rgba(201,152,38,1)), color-stop(75%,rgba(48,255,230,1)), color-stop(100%,rgba(48,255,144,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(bottom,  rgba(48,255,144,1) 0%,rgba(237,45,237,1) 25%,rgba(201,152,38,1) 50%,rgba(48,255,230,1) 75%,rgba(48,255,144,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(bottom,  rgba(48,255,144,1) 0%,rgba(237,45,237,1) 25%,rgba(201,152,38,1) 50%,rgba(48,255,230,1) 75%,rgba(48,255,144,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(bottom,  rgba(48,255,144,1) 0%,rgba(237,45,237,1) 25%,rgba(201,152,38,1) 50%,rgba(48,255,230,1) 75%,rgba(48,255,144,1) 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  rgba(48,255,144,1) 0%,rgba(237,45,237,1) 25%,rgba(201,152,38,1) 50%,rgba(48,255,230,1) 75%,rgba(48,255,144,1) 100%); /* W3C */
+	
+	border-radius: calc(2 * var(--borderWidth));
+	z-index: -1;
+	animation: animatedgradient 25s infinite linear;
+	-webkit-animation: animatedgradient 25s infinite linear;
+}
+
+@keyframes animatedgradient {
+	from {
+		background-position-y: 0px;
+	}
+	to { 
+		background-position-y: 3000px;
+	}
+}
+
+.quote{
+	transform-origin: center;
+	animation: quoteAnim 2s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+@keyframes quoteAnim {
+	0% {
+		opacity: 0;
+		transform: scale(0);
+	}
+	100% { 
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+.statsContainer{
+	width: 100%;
+	position: absolute;
+	background-color: rgba(0, 0, 0, 0.18);
+	filter: brightness(2.5) drop-shadow(-1px 6px 3px rgba(50, 50, 0, 0.75))
+}
+
+.statsContainer p{
+	margin-left: 5px;
+	font-family: TarrgetLaser;
+	font-size: 1em;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.bossContainer{
+	height: 100%;
+	position: relative;
+	cursor: pointer;
+	user-select: none;
+	user-drag: none;
+	-webkit-user-drag: none;
+}
+.waifuContainer{
+	height: 100%;
+	position: relative;
+	cursor: pointer;
+	user-select: none;
+	user-drag: none;
+	-webkit-user-drag: none;
+	animation: waifuContainerAnim 1s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.selWaifuContainer{
+	height: 100%;
+	position: relative;
+	cursor: pointer;
+	user-select: none;
+	user-drag: none;
+	-webkit-user-drag: none;
+	animation: selWaifuAnim 1s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.selBossContainer{
+	height: 100%;
+	position: relative;
+	cursor: pointer;
+	user-select: none;
+	user-drag: none;
+	-webkit-user-drag: none;
+	animation: selBossAnim 1s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.winContainer{
+	height: 100%;
+	position: relative;
+	cursor: pointer;
+	user-select: none;
+	user-drag: none;
+	-webkit-user-drag: none;
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+	animation: winContainerAnim 2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite forwards;
+}
+.lossContainer{
+	height: 100%;
+	position: relative;
+	cursor: pointer;
+	user-select: none;
+	user-drag: none;
+	-webkit-user-drag: none;
+	filter: brightness(1);
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+	animation: lossContainerAnim 1s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+}
+
+@keyframes winContainerAnim {
+	0% {
+		filter: brightness(1.5);
+	}
+	50% {
+		filter: brightness(1);
+	}
+	100% {
+		filter: brightness(1.5);
+	}
+}
+@keyframes lossContainerAnim {
+	0% {
+		filter: brightness(1);
+	}
+	100% {
+		filter: brightness(.25);
+	}
+}
+
+.bossCover{
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	z-index: 1;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center;
+	filter: blur(8px) brightness(.75);
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.bossThumbnail {
+	position: absolute;
+	z-index: 2;
+	top: 40%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	filter: drop-shadow(-1px 6px 3px rgba(50, 50, 0, 0.5));
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.bossThumbnail img{
+	height: 350px;
+	user-select: none;
+	user-drag: none;
+	pointer-events: none;
+	-webkit-user-drag: none;
+	transform: translate(0, 75px);
+	filter: blur(1px) brightness(.75);
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.bossHp{
+	user-select: none;
+	text-align: center;
+	width: 100%;
+	position: absolute;
+	z-index: 2;
+	top: 65%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: white;
+	-webkit-text-stroke: 2px aqua;
+	opacity: .25;
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+	filter: drop-shadow(-1px 6px 3px rgba(50, 50, 0, 0.5))
+}
+.bossHp p{
+	font-family: TarrgetLaser;
+	font-size: 125px;
+}
+
+.bossName{
+	user-select: none;
+	text-align: center;
+	width: 100%;
+	position: absolute;
+	z-index: 2;
+	bottom: 5%;
+	left: 50%;
+	transform: translate(-50%, 50%);
+	color: white;
+	-webkit-text-stroke: 2px aqua;
+	opacity: .25;
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+	filter: drop-shadow(-1px 6px 3px rgba(50, 50, 0, 0.5))
+}
+.bossName p{
+	font-family: TarrgetLaser;
+	font-size: 45px;
+}
+
+.bossContainer:hover .bossCover{
+	filter: blur(2px) brightness(1)
+}
+.bossContainer:hover img{
+	filter:  blur(0px) brightness(1);
+	animation: bossAnim 5s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+}
+.bossContainer:hover .bossHp, .bossContainer:hover .bossName {
+	opacity: 1;
+}
+
+.selBossContainer .bossCover, .winContainer .bossCover{
+	filter: blur(2px) brightness(1)
+}
+.selBossContainer img, .winContainer img{
+	filter:  blur(0px) brightness(1);
+	animation: bossAnim 5s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+}
+.selBossContainer .bossHp, .selBossContainer .bossName , .winContainer .bossHp, .winContainer .bossName {
+	opacity: 1;
+}
+
+.waifuCover{
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	z-index: 1;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center;
+	filter: blur(8px) brightness(.75);
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.waifuThumbnail {
+	position: absolute;
+	z-index: 2;
+	top: 40%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	filter: drop-shadow(-1px 6px 3px rgba(50, 50, 0, 0.5));
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.waifuThumbnail img{
+	height: 350px;
+	user-select: none;
+	user-drag: none;
+	pointer-events: none;
+	-webkit-user-drag: none;
+	transform: translate(0, 75px);
+	filter: blur(1px) brightness(.75);
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.waifuAttack{
+	user-select: none;
+	text-align: center;
+	width: 100%;
+	position: absolute;
+	z-index: 2;
+	top: 65%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: white;
+	-webkit-text-stroke: 2px aqua;
+	opacity: .25;
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+	filter: drop-shadow(-1px 6px 3px rgba(50, 50, 0, 0.5))
+}
+.waifuDefense{
+	user-select: none;
+	text-align: center;
+	width: 100%;
+	position: absolute;
+	z-index: 2;
+	top: 75%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: white;
+	-webkit-text-stroke: 2px aqua;
+	opacity: .25;
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+	filter: drop-shadow(-1px 6px 3px rgba(50, 50, 0, 0.5))
+}
+.waifuAttack p, .waifuDefense p{	
+	font-family: TarrgetLaser;
+	font-size: 100px;
+}
+
+.selWaifuContainer .waifuCover, .winContainer .waifuCover{
+	filter: blur(2px) brightness(1)
+}
+.selWaifuContainer img, .winContainer img{
+	filter:  blur(0px) brightness(1);
+	animation: waifuAnim 5s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+}
+.selWaifuContainer .waifuAttack, .selWaifuContainer .waifuDefense, .winContainer .waifuAttack, .winContainer .waifuDefense{
+	opacity: 1;
+}
+
+@keyframes bossAnim {
+	0% {
+		transform: translate(0, 75px);
+	}
+	50% {
+		transform: translate(0, 25px);
+	}
+	100% {
+		transform: translate(0, 75px);
+	}
+}
+@keyframes waifuAnim {
+	0% {
+		transform: translate(0, 75px);
+	}
+	50% {
+		transform: translate(0, 25px);
+	}
+	100% {
+		transform: translate(0, 75px);
+	}
+}
+
+@keyframes waifuContainerAnim {
+	0% {
+		transform: translate(-100%, 0%);
+	}
+	100% {
+		transform: translate(0, 0);
+	}
+}
+@keyframes selBossAnim {
+	0% {
+		transform: translate(0, -100%);
+	}
+	100% {
+		transform: translate(0, 0);
+	}
+}
+@keyframes selWaifuAnim {
+	0% {
+		transform: translate(0, 100%);
+	}
+	100% {
+		transform: translate(0, 0);
+	}
+}
+
+.RulesContainer{
+	position: relative;
+	width: 100%;
+	z-index: 5;
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.RulesBtn{
+	color: white;
+	text-align: center;
+	font-family: TarrgetLaser !important;
+	cursor: pointer;
+	user-select: none;
+	user-drag: none;
+	-webkit-user-drag: none;
+}
+
+.Rules{
+	width: 750px;
+	padding: 8px;
+	border: solid 1px white;
+	position: absolute;
+	z-index: 5;
+	top:5px;
+	left: 50%;
+	user-select: none;
+	user-drag: none;
+	-webkit-user-drag: none;
+	background-color: rgba(0, 0, 0, .75);
+	transform: translate(-50%, 0px);
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.Rules p{
+	margin: 10px 0px
+}
+.RollContainer{
+	min-width: 55px;
+	min-height: 55px;
+	margin: 0px 5px;
+	background-color: black;
+	border: 1px solid white;
+	border-radius: 25%;
+	position: relative;
+	opacity: 0;
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+	animation-name: rollAnim;
+	animation-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+	animation-duration: 1s;
+	animation-fill-mode: forwards;
+}
+
+.RollContainer .RollText{
+	color: white;
+	font-size: 25px;
+	font-family: TarrgetLaser;
+	text-align: center;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+}
+
+@keyframes rollAnim {
+	0% {
+		opacity: 0;
+		transform: translate(0%, 100%);
+	}
+	100% {
+		opacity: 1;
+		transform: translate(0, 0);
+	}
+}
+
+.totalDmgContainer{
+	width: 150px;
+	height: 100px;
+	margin: 5px 0px;
+	border: 1px solid white;
+	border-radius: 10px;
+	background-color: black;
+	position: relative;
+	opacity: 0;
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+	animation-name: totalDmgAnim;
+	animation-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+	animation-duration: 1s;
+	animation-fill-mode: forwards;
+}
+.totalText{
+	color: white;
+	font-size: 15px !important;
+	font-family: TarrgetLaser !important;
+	text-align: center;
+	position: absolute;
+	top: 0px;
+	left: 50%;
+	z-index: 1;
+	transform: translate(-50%,0%);
+}
+.totalDmgContainer .totalDmgText{
+	color: white;
+	font-size: 45px;
+	font-family: TarrgetLaser;
+	text-align: center;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+}
+@keyframes totalDmgAnim{
+	0% {
+		opacity: 0;
+		transform: translate(-100%, 0%);
+	}
+	100% {
+		opacity: 1;
+		transform: translate(0, 0);
+	}
+}
+
+.rewardTextContainer{
+	width: 500px;
+	margin: 5px 0px;
+	border: 1px solid white;
+	border-radius: 10px;
+	background-color: black;
+	position: absolute;
+	bottom: 0%;
+	left: 50%;
+	z-index: 10;
+	transform: translate(-50%,110%);
+	transition: all .250s cubic-bezier(0.4, 0.0, 0.2, 1);
+	animation: rewardTextAnim 250ms cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+}
+.rewardTextContainer .rewardText{
+	color: white;
+	font-size: 25px !important;
+	font-family: TarrgetLaser !important;
+	text-align: center;
+}
+@keyframes rewardTextAnim{
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
