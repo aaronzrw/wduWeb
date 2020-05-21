@@ -32,8 +32,6 @@ import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import Backdrop from '@material-ui/core/Backdrop';
 
 // Components
-import Navbar from './components/Navbar';
-import AuthRoute from './util/AuthRoute';
 import themeObject from './util/theme';
 
 //pages
@@ -46,7 +44,6 @@ import Shop from './pages/shop';
 import Search from './pages/search';
 import Gauntlet from './pages/gauntlet';
 
-import { Scrollbars } from 'react-custom-scrollbars';
 import Layout from './components/Layout';
 
 const theme = createMuiTheme(themeObject);
@@ -97,10 +94,6 @@ class App extends Component {
     this.setState({ width: window.innerWidth, height: window.innerHeight });
   }
 
-  handleSnackClose() {
-    store.dispatch({ type: "CloseSnack", flag: false })
-  }
-
   render() {
     const { classes } = this.props;
     var width = this.state.width - 73;
@@ -120,13 +113,13 @@ class App extends Component {
                   <LoginSignUp />
                 :
                   <Layout>
-                      <Route exact path="/" render={(props) => <Home {...props} height={height} width={width}  />}/>
-                      <Route exact path="/Login" render={(props) => <LoginSignUp {...props} height={height} width={width}  />}/>
-                      <Route exact path="/profile" render={(props) => <Profile {...props} height={height} width={width}  />}/>
-                      <Route exact path="/search" render={(props) => <Search {...props} height={height} width={width}  />}/>
-                      <Route exact path="/shop" render={(props) => <Shop {...props} height={height} width={width}  />}/>
-                      <Route exact path="/trade" render={(props) => <Trade {...props} height={height} width={width}  />}/>
-                      <Route exact path="/gauntlet" render={(props) => <Gauntlet {...props} height={height} width={width}  />}/>
+                    <Route exact path="/" render={(props) => <Home {...props} height={height} width={width}  />}/>
+                    <Route exact path="/Login" render={(props) => <LoginSignUp {...props} height={height} width={width}  />}/>
+                    <Route exact path="/profile" render={(props) => <Profile {...props} height={height} width={width}  />}/>
+                    <Route exact path="/search" render={(props) => <Search {...props} height={height} width={width}  />}/>
+                    <Route exact path="/shop" render={(props) => <Shop {...props} height={height} width={width}  />}/>
+                    <Route exact path="/trade" render={(props) => <Trade {...props} height={height} width={width}  />}/>
+                    <Route exact path="/gauntlet" render={(props) => <Gauntlet {...props} height={height} width={width}  />}/>
                   </Layout>
               }
             </div>
@@ -150,4 +143,4 @@ const mapStateToProps = (state) => ({
   UI: state.UI
 });
 
-export default  withRouter(connect(mapStateToProps)(withStyles(styles)(App)));
+export default withRouter(connect(mapStateToProps)(withStyles(styles)(App)));
