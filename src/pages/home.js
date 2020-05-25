@@ -1,60 +1,37 @@
-import React, { Component, PureComponent, useCallback, useState } from 'react'
-import moment from 'moment';
-import PropTypes from 'prop-types';
-
-import CounterInput from "react-counter-input";
-import _ from 'lodash';
-
-import AMCharDetails from '../components/AMCharDetails'
-import ComicCharDetails from '../components/ComicCharDetails'
-import CountDown from '../components/CountDown'
-
-import TopVote from '../media/TopVote.png'
-import { submitVote } from '../redux/actions/dataActions'
-import LinkIcon from '@material-ui/icons/Link';
-
-// MUI Stuff
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import withStyles from '@material-ui/core/styles/withStyles';
-
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
-import Card from '@material-ui/core/Card';
-import Badge from '@material-ui/core/Badge';
-import Fade from '@material-ui/core/Fade';
-import Fab from '@material-ui/core/Fab';
-import Zoom from '@material-ui/core/Zoom';
-import Grow from '@material-ui/core/Grow';
 import Avatar from '@material-ui/core/Avatar';
+import Badge from '@material-ui/core/Badge';
 import Button from '@material-ui/core/Button';
-import Tooltip from '@material-ui/core/Tooltip';
-import Divider from '@material-ui/core/Divider';
-import NotesIcon from '@material-ui/icons/Notes';
-import Collapse from '@material-ui/core/Collapse';
-import PeopleIcon from '@material-ui/icons/People';
-import TextField from '@material-ui/core/TextField';
-import CardMedia from '@material-ui/core/CardMedia';
-import Typography from '@material-ui/core/Typography';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import HowToVoteIcon from '@material-ui/icons/HowToVote';
+import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
+import CardContent from '@material-ui/core/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-
-import { FixedSizeGrid as VirtGrid, FixedSizeList as List } from 'react-window';
-import AutoSizer from "react-virtualized-auto-sizer";
+import Fab from '@material-ui/core/Fab';
+import Grid from '@material-ui/core/Grid';
+import Grow from '@material-ui/core/Grow';
+import Paper from '@material-ui/core/Paper';
+import withStyles from '@material-ui/core/styles/withStyles';
+import Tooltip from '@material-ui/core/Tooltip';
+import Typography from '@material-ui/core/Typography';
+import Zoom from '@material-ui/core/Zoom';
+import HowToVoteIcon from '@material-ui/icons/HowToVote';
+import LinkIcon from '@material-ui/icons/Link';
+import NotesIcon from '@material-ui/icons/Notes';
+import _ from 'lodash';
+import React, { Component, PureComponent, useCallback } from 'react';
+import CounterInput from "react-counter-input";
 import { Scrollbars } from 'react-custom-scrollbars';
-
+import AutoSizer from "react-virtualized-auto-sizer";
+import { FixedSizeList as List } from 'react-window';
 // Redux stuff
-import watch from 'redux-watch'
+import watch from 'redux-watch';
+import AMCharDetails from '../components/AMCharDetails';
+import ComicCharDetails from '../components/ComicCharDetails';
+import CountDown from '../components/CountDown';
+import TopVote from '../media/TopVote.png';
+import { submitVote } from '../redux/actions/dataActions';
 import store from '../redux/store';
-import { connect, useSelector } from 'react-redux';
-import {
-    SET_POLL_WAIFUS,
-    LOADING_UI,
-    STOP_LOADING_UI
-  } from '../redux/types';
+
 
 const styles = (theme) => ({
 	...theme.spreadThis,
@@ -467,7 +444,7 @@ class Home extends Component {
 																				</div>
 																			</Grid>
 			
-																			<Grid item xs={12} style={{height: `calc(100% - ${this.state.userInfo.points == 0 ? "275px" : "200px"} )`}}>
+																			<Grid item xs={12} style={{height: `calc(100% - ${this.state.weeklyPoll.isActive && this.state.userInfo.points == 0 ? "200px" : "275px"} )`}}>
 																				<AutoSizer>
 																					{({height, width}) =>
 																					{
