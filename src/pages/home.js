@@ -10,7 +10,7 @@ import ComicCharDetails from '../components/ComicCharDetails'
 import CountDown from '../components/CountDown'
 
 import TopVote from '../media/TopVote.png'
-import { submitWeeklyVote, submitDailyVote } from '../redux/actions/dataActions'
+import { submitVote } from '../redux/actions/dataActions'
 import LinkIcon from '@material-ui/icons/Link';
 
 // MUI Stuff
@@ -164,8 +164,7 @@ class Home extends Component {
 			dailyPollWaifus: store.getState().data.dailyPollWaifus,
 			voteCount: 0,
 		};
-			
-		this.setHasVoted = this.setHasVoted.bind(this)
+		
 		this.showWeeklyCardDetails = this.showWeeklyCardDetails.bind(this)
 		this.showDailyCardDetails = this.showDailyCardDetails.bind(this)
 		this.closeWeeklyCardDetails = this.closeWeeklyCardDetails.bind(this)
@@ -177,7 +176,6 @@ class Home extends Component {
 		let userReducerWatch = watch(store.getState, 'user')
 
 		store.subscribe(dataReducerWatch((newVal, oldVal, objectPath) => {
-			newVal.weeklyPollWaifus = this.setHasVoted(newVal.weeklyPollWaifus)
 			this.setState({ ...newVal, weeklyPoll: newVal.poll.weekly, dailyPoll: newVal.poll.daily, })
 			if(this.state.card != null){
 				if(this.state.card.husbando == "Poll")
@@ -193,15 +191,6 @@ class Home extends Component {
 	}
 
 	componentDidMount(){
-		var pws = this.setHasVoted(this.state.weeklyPollWaifus)
-		this.setState({weeklyPollWaifus: pws})
-	}
-
-	setHasVoted(pws){
-		pws.forEach(x => {
-			x.hasVoted = !_.isEmpty(x.votes.filter(y => y.husbandoId == this.state.userInfo.userId));
-		})
-		return pws;
 	}
 
 	showWeeklyCardDetails(card){
@@ -478,7 +467,7 @@ class Home extends Component {
 																				</div>
 																			</Grid>
 			
-																			<Grid item xs={12} style={{height: `calc(100% - ${!this.state.card.hasVoted || (this.state.userInfo.points == 0) ? "275px" : "200px"} )`}}>
+																			<Grid item xs={12} style={{height: `calc(100% - ${this.state.userInfo.points == 0 ? "275px" : "200px"} )`}}>
 																				<AutoSizer>
 																					{({height, width}) =>
 																					{
@@ -502,7 +491,7 @@ class Home extends Component {
 																			</Grid>
 																			
 																			{
-																				this.state.weeklyPoll.isActive && !this.state.card.hasVoted && this.state.userInfo.points > 0 ?
+																				this.state.weeklyPoll.isActive && this.state.userInfo.points > 0 ?
 																					<Grid container item xs={12} alignItems="center" justify="center" style={{height: "75px"}}>
 																						<div style={{ borderTop: "1px solid #0000003b", borderBottom: "1px solid #0000003b", display: "flex",padding: "5px"}}>
 																							<CounterInput
@@ -515,7 +504,7 @@ class Home extends Component {
 																							/>
 																							<Button disabled={this.state.voteCount == 0}
 																								style={{ fontFamily:"Edo", marginLeft: "50px" }}
-																								onClick={() => submitWeeklyVote(this.state.voteCount, this.state.card)}
+																								onClick={() => submitVote(this.state.voteCount, this.state.card)}
 																							>Submit Vote</Button>
 																						</div>
 																					</Grid>
@@ -650,7 +639,7 @@ class Home extends Component {
 																							/>
 																							<Button disabled={this.state.voteCount == 0}
 																								style={{ fontFamily:"Edo", marginLeft: "50px" }}
-																								onClick={() => submitDailyVote(this.state.voteCount, this.state.card)}
+																								onClick={() => submitVote(this.state.voteCount, this.state.card)}
 																							>Submit Vote</Button>
 																						</div>
 																					</Grid>

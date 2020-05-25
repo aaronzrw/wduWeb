@@ -554,7 +554,7 @@ a {
 	width: 100%;
 	position: absolute;
 	z-index: 2;
-	top: 65%;
+	top: 70%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 	color: white;
@@ -569,7 +569,7 @@ a {
 	width: 100%;
 	position: absolute;
 	z-index: 2;
-	top: 75%;
+	top: 80%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 	color: white;
@@ -580,7 +580,7 @@ a {
 }
 .waifuAttack p, .waifuDefense p{	
 	font-family: TarrgetLaser;
-	font-size: 100px;
+	font-size: 90px;
 }
 
 .selWaifuContainer .waifuCover, .winContainer .waifuCover{

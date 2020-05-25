@@ -65,7 +65,7 @@ class App extends Component {
     firebase.auth().onAuthStateChanged(async function(authUser) {
       if(authUser != null){
         localStorage.setItem('authUser', JSON.stringify(authUser));
-        getUserData(await authUser.getIdToken())
+        getUserData(await authUser.getIdToken(), authUser.uid)
       }
       else{
         store.dispatch({ type: SET_UNAUTHENTICATED });

@@ -141,10 +141,10 @@ import {
     store.dispatch({ type: SET_SNACKBAR, payload: [{type: "info", message: "You Have Been Logged Out"}]})
   };
   
-  export function getUserData(token){
+  export function getUserData(token, userId){
     store.dispatch({ type: LOADING_USER });
     setAuthorizationHeader(token);
-    setRealTimeListeners()
+    setRealTimeListeners(userId)
 /*     verifyToken()
     .then(() => {
       store.dispatch({ type: LOADING_USER });

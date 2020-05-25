@@ -18,6 +18,7 @@ import KeyboardBackspaceIcon from "@material-ui/icons/KeyboardBackspace";
 import CloseIcon from '@material-ui/icons/Close';
 import SwapHorizIcon from '@material-ui/icons/SwapHoriz';
 import PeopleIcon from "@material-ui/icons/People";
+import LinkIcon from '@material-ui/icons/Link';
 
 import Grow from "@material-ui/core/Grow";
 import Zoom from "@material-ui/core/Zoom";
@@ -169,6 +170,56 @@ const UserWaifus = ({ data , columnIndex, rowIndex, style }) => {
   )
 }
 
+class WaifuDetails extends PureComponent {
+  constructor(props){
+    super();
+    this.state = {
+      closeDetails: props.closeDetails,
+      card: props.waifu,
+    };
+  }
+
+  render() {
+    return (
+      <Grow
+        in={true}
+        style={{ transformOrigin: '0 0 0' }}
+        timeout={500}
+      >
+        <Grid container alignItems="center" justify="center" style={{height: "100%", position: "absolute", top:"0", left: "0", zIndex:"10", backgroundColor: "#00000091" }} >
+          <ClickAwayListener onClickAway={this.state.closeDetails}>
+            <Grid item xs={10} style={{ height: "75%" }}>
+              <Grid container item xs={12} style={{ height:"100%" }}>
+                <Grid item xs={4} style={{ height:"100%" }}>
+                  <Paper style={{position:"relative", backgroundImage: "url("+this.state.card.img+")", backgroundPosition:"top", backgroundSize:"cover",
+                    height: "100%",width:"100%",borderRadius: "20px 0px 0px 20px", display:"flex", alignItems:"flex-end", justifyContent:"center"}}>
+                      <Fab size="medium" style={{position: 'absolute', top: 16, right: 8}} color={"primary"} onClick={() => window.open(this.state.card.link, '_blank')}>
+                        <LinkIcon />
+                      </Fab>
+                      
+                      <div className="waifuAttack" style={{opacity: 1}}>
+                        <Typography>Atk: {this.state.card.attack}</Typography>
+                      </div>
+                      <div className="waifuDefense" style={{opacity: 1}}>
+                        <Typography>Def: {this.state.card.defense}</Typography>
+                      </div>
+                  </Paper>
+                </Grid>
+                
+                <Grid item xs={8}>
+                  <Paper style={{borderRadius: "0px 20px 20px 0px"}} className="cardDetails">
+                    {this.state.card.type == "Anime-Manga" ? <AMCharDetails card={this.state.card}/> : <ComicCharDetails card={this.state.card} />}
+                  </Paper>
+                </Grid>
+              </Grid>
+            </Grid>
+          </ClickAwayListener>
+        </Grid>
+      </Grow>     
+    );
+  }
+}
+
 class Trades extends PureComponent {
   render() {
     // Access the items array using the "data" prop:
@@ -258,7 +309,7 @@ class Trades extends PureComponent {
                   <AutoSizer>
                     {({height, width}) =>
                     {
-                      var columnWidth = 250;
+                      var columnWidth = 100;
                       var columnCount = Math.floor(width / columnWidth)
                       if((width/columnCount) > columnCount)
                         columnWidth = (width/columnCount)
@@ -386,9 +437,11 @@ export class Trade extends Component {
         showCharTab: true,
         makeTrade: false,
         selectedUser: null,
+        showDetails: false,
       };
 
       this.selectedUser = this.selectedUser.bind(this)
+      this.selectedCard = this.selectedCard.bind(this);
       this.selectTradeWaifu = this.selectTradeWaifu.bind(this)
       this.closeView = this.closeView.bind(this)
       
@@ -407,10 +460,13 @@ export class Trade extends Component {
     }
 
     selectedUser(user){
-      console.log(user)
       this.setState({selectedUser: user})
     }
     
+    selectedCard(card){
+      this.setState({selectedWaifu: card, showDetails: true})
+    
+    }	
     selectTradeWaifu(user,waifu){
       var from = this.state.tradeFrom;
       var to = this.state.tradeTo;
@@ -594,7 +650,7 @@ export class Trade extends Component {
                                       rowHeight={320}
                                       columnCount={columnCount}
                                       columnWidth={columnWidth}
-                                      itemData={[ data, () => console.log("Do Nothing"), {...this.props} ]}
+                                      itemData={[ data, this.selectedCard, {...this.props} ]}
                                       outerElementType={CustomScrollbarsVirtualList}
                                       onScroll={({scrollTop}) => {
                                         this.currScroll = scrollTop;
@@ -892,6 +948,15 @@ export class Trade extends Component {
                       </Zoom>
               
                     </Grid>
+                  }
+
+                  {
+                    this.state.showDetails ?
+                      <Grid container item xs={12} style={{height:"100%", position:"absolute", zIndex:1}}>
+                        <WaifuDetails waifu={this.state.selectedWaifu} userInfo={this.state.userInfo}
+                        closeDetails={() => this.setState({selectedWaifu: null, showDetails: false})} />
+                      </Grid>
+                    : <></> 
                   }
                   </Grid>
                 </ClickAwayListener>
