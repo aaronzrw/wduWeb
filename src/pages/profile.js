@@ -371,7 +371,7 @@ class Trades extends PureComponent {
 			item.to.points <= toUser.points && item.to.submitSlots <= toUser.submitSlots){
 				var tt = _.difference(fromWaifus.map(x => x.link), fromUser.waifus.map(x => x.link)).length;
 				var te = _.difference(toWaifus.map(x => x.link), toUser.waifus.map(x => x.link)).length;
-				canAccept = tt == 0 && te == 0 && !store.getState().data.poll.isActive;
+				canAccept = tt == 0 && te == 0 && !store.getState().data.poll.weekly.isActive;
 		}
 
     return (
@@ -551,7 +551,6 @@ class Profile extends Component {
     super();
     this.state = {
 			loading: store.getState().data.loading,
-			pollIsActive: store.getState().data.poll.isActive,
 			userInfo: {...store.getState().user.credentials, waifus: store.getState().user.waifus },
 			users: store.getState().user.otherUsers,
 			trades: store.getState().data.trades.filter(x => x.from.husbandoId == store.getState().user.credentials.userId ||

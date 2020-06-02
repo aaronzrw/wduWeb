@@ -28,19 +28,20 @@ import lz from "lz-string";
 const graph = require('fbgraph');
 
 export async function getSearchData(){
-  var returnObj = await firebase.storage().ref('filters/SearchFile.json').getDownloadURL()
-  .then(function(url) {
-    return fetch(url);
-  })
-  .then(response => response.json())
-  .then((jsonData) => {
-    return JSON.parse(lz.decompress(jsonData));
-  })
-  .catch((error) => {
-    console.error(error)
-  })
+  store.dispatch({ type: LOADING_UI });
 
-  store.dispatch({ type: SET_SEARCH_DATA, payload: returnObj });
+  await axios.get('/getSearchData')
+  .then( async (res) => {    
+    return (await fetch(res.data)).json()
+  })
+  .then((data) => {
+    data = JSON.parse(lz.decompress(data));
+    store.dispatch({ type: SET_SEARCH_DATA, payload: data });
+  })
+  .catch((err) => {
+    console.log(err)
+  });
+  
   store.dispatch({ type: STOP_LOADING_UI });
 }
 
