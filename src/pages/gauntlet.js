@@ -146,6 +146,7 @@ export class Gauntlet extends Component {
     this.selectBoss = this.selectBoss.bind(this)
     this.selectWaifu = this.selectWaifu.bind(this)
     this.startFight = this.startFight.bind(this)
+    this.checkBossReq = this.checkBossReq.bind(this)
 
     let dataReducerWatch = watch(store.getState, 'data')
     store.subscribe(dataReducerWatch((newVal, oldVal, objectPath) => {
@@ -193,8 +194,70 @@ export class Gauntlet extends Component {
     return userFightRec;
   }
 
+  checkBossReq(waifu){
+    var boss = _.cloneDeep(this.state.selectedBoss);
+
+    var canFight = true;
+    var messages = [];
+
+    boss.requirements.forEach(req => {
+
+      Object.keys(req).forEach(type => {;
+      
+        switch(type){
+          case "rank":
+            Object.keys(req[type]).forEach(x => {
+              switch(x){
+                case "equal":
+                  if(req[type][x] == waifu.rank)
+                    canFight = true;
+                  else{
+                    messages.push({ type: "Warning", message: "Waifu Rank Must Be " +req[type][x]  + " To Fight Boss" })
+                  }
+                  break;
+                case "min":
+                  if(req[type][x] <= waifu.rank)
+                    canFight = true;
+                  else{
+                    messages.push({ type: "Warning", message: "Waifu Rank Too Low To Fight Boss (Min Rank - " + req[type][x]  + " )" })
+                  }
+                  break;
+                case "max":
+                  if(req[type][x] >= waifu.rank)
+                    canFight = true;
+                  else{
+                    messages.push({ type: "Warning", message: "Waifu Rank Too High To Fight Boss (Max Rank - " + req[type][x]  + " )" })
+                  }
+                  break;
+              }
+            })
+            break;
+          case "originType":
+            if(req[type].map(t => t.toLowerCase()).includes(waifu.type.toLowerCase()))
+              canFight = true;
+            else{
+              messages.push({ type: "Warning", message: "Boss Will Only Fight " + req[type].join() + " Characters"})
+            }
+            break;
+        }
+      })
+    })
+
+    return {canFight, messages};
+  }
+
   selectWaifu(waifu){
     var alreadyUsed = false;
+
+    var reqCheck = this.checkBossReq(waifu)
+    if(reqCheck.messages.length > 0){
+      store.dispatch({
+        type: SET_SNACKBAR,
+        payload: reqCheck.messages
+      });
+      return
+    }
+
     if(this.state.userFightRec != null){
       if(this.state.userFightRec.defeated){
         store.dispatch({
@@ -228,7 +291,7 @@ export class Gauntlet extends Component {
   async startFight(){
     this.setState({fightActive: true});
     var bossFightObj = {
-      waifuId: this.state.selectedWaifu.id,
+      waifuId: this.state.selectedWaifu.waifuId,
       diceCount : this.state.selectedWaifu.rank,
       attack : this.state.selectedWaifu.attack,
       defense : this.state.selectedWaifu.defense,

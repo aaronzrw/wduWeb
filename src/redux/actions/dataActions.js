@@ -25,6 +25,7 @@ import store from '../store';
 import jwtDecode from 'jwt-decode';
 import _ from 'lodash'
 import lz from "lz-string";  
+import { user } from 'firebase-functions/lib/providers/auth';
 const graph = require('fbgraph');
 
 export async function getSearchData(){
@@ -47,35 +48,66 @@ export async function getSearchData(){
 
 export async function useRankCoin(waifu){
   store.dispatch({ type: LOADING_UI });
-
-  await axios.post('/useRankCoin', waifu)
-  .then((res) => {
-    console.log(res.data)
-  })
-  .catch((err) => {
+  
+  var user = store.getState().user.credentials;
+	await firebase.firestore().doc(`waifus/${waifu.waifuId}`).get()
+	.then(doc => {
+		var stats = getBaseStats(doc.data().rank + 1);
+		return doc.ref.update({ ...stats })
+	})
+	.then(() => {
+		return firebase.firestore().doc(`users/${user.userId}`).get()
+	})
+	.then(doc => {
+		return doc.ref.update({ rankCoins: doc.data().rankCoins - 1 });
+	})
+  .then(()=>{
     store.dispatch({
       type: SET_SNACKBAR,
-      payload: err
+      payload: {type: "success", message: `${waifu.name} Has Been Ranked Up`}
     });
-  });
-  
+  })
+  .catch((error) => {
+    store.dispatch({
+      type: SET_SNACKBAR,
+      payload: {type: "error", message: `Error Ranking Up Waifu`}
+    });
+  })
+
   store.dispatch({ type: STOP_LOADING_UI });
 }
 
-export async function useStatCoin(waifu, stat){
+export async function useStatCoin(waifu, stats){
   store.dispatch({ type: LOADING_UI });
-
-  await axios.post('/useStatCoin', {waifu, stat})
-  .then((res) => {
-    console.log(res.data)
-  })
-  .catch((err) => {
+  
+  var user = store.getState().user.credentials;
+	await firebase.firestore().doc(`waifus/${waifu.waifuId}`).get()
+	.then(doc => {
+    var waifu = doc.data()
+    waifu.attack = waifu.attack + stats.attack;
+    waifu.defense = waifu.defense + stats.defense;
+		
+		return doc.ref.set(waifu)
+	})
+	.then(() => {
+		return firebase.firestore().doc(`users/${user.userId}`).get()
+	})
+	.then(doc => {
+		return doc.ref.update({ statCoins: doc.data().statCoins - (stats.attack + stats.defense) });
+	})
+  .then(()=>{
     store.dispatch({
       type: SET_SNACKBAR,
-      payload: err
+      payload: {type: "success", message: `${waifu.name}'s stats have been updated`}
     });
-  });
-  
+  })
+  .catch((error) => {
+    store.dispatch({
+      type: SET_SNACKBAR,
+      payload: {type: "error", message: `Error Using Stat Coin(s)`}
+    });
+  })
+
   store.dispatch({ type: STOP_LOADING_UI });
 }
 
@@ -92,7 +124,6 @@ export async function submitVote(voteCount, waifu){
 
   var voteObj = {
     vote: voteCount,
-    husbando: store.getState().user.credentials.userName,
     husbandoId: store.getState().user.credentials.userId,
     img: store.getState().user.credentials.img
   };
@@ -113,7 +144,7 @@ export async function submitVote(voteCount, waifu){
 
 export async function submitWaifu(waifuData){
   store.dispatch({ type: LOADING_UI });
-
+  
   await axios.post('/submitWaifu', waifuData)
   .then((res) => {
     console.log(res.data)
@@ -146,16 +177,17 @@ export async function buyWaifu(waifu){
 }
 
 export function submitTrade(trade){
-  var weeklyPoll = store.getState().data.poll.weekly;
-  if(weeklyPoll.isActive){
-    store.dispatch({
-      type: SET_SNACKBAR,
-      payload: [{ type: "error", message: "Cannot Submit Trade During Active Poll" }]
-    });
-    return
-  }
+  // var weeklyPoll = store.getState().data.poll.weekly;
+  // if(weeklyPoll.isActive){
+  //   store.dispatch({
+  //     type: SET_SNACKBAR,
+  //     payload: [{ type: "error", message: "Cannot Submit Trade During Active Poll" }]
+  //   });
+  //   return
+  // }
 
   trade.status = "Active";
+  trade.createdDate = new Date();
 
   firebase.firestore().collection("trades").add({...trade})
   .then(() => {
@@ -179,6 +211,8 @@ export function updateTrade(trade, status){
 export async function fightBoss(bossFightObj){
   var uid = await firebase.auth().currentUser.uid;
   var waifu = (await firebase.firestore().doc(`waifus/${bossFightObj.waifuId}`).get())
+  waifu = {...waifu.data(), waifuId: waifu.id}
+
   var boss = (await firebase.firestore().doc(`gauntlet/${bossFightObj.bossId}`).get())
   var fights = _.cloneDeep(boss.data().fights);
   var userFightRec = fights.filter(x => x.husbandoId == uid)
@@ -208,7 +242,7 @@ export async function fightBoss(bossFightObj){
   if(totalDmg > bossFightObj.bossHp){
     fightResult = 1;
     rewardResult = await buildBossRewardStr(bossFightObj.bossReward);
-    userFightRec.waifusUsed.push(waifu.id)
+    userFightRec.waifusUsed.push(waifu.waifuId)
     userFightRec.defeated = true;
 
     /*store.dispatch({
@@ -221,8 +255,8 @@ export async function fightBoss(bossFightObj){
     {
       fightResult = 2;
       rewardResult = "Waifu Lost And Was Sent To Shop!";
-      userFightRec.waifusUsed.push(waifu.id)
-      await waifu.ref.update({husbando: "Shop", husbandoId:""})
+      userFightRec.waifusUsed.push(waifu.waifuId)
+      await waifu.ref.update({husbandoId: "Shop"})
 
       /*store.dispatch({
         type: SET_SNACKBAR,
@@ -233,7 +267,7 @@ export async function fightBoss(bossFightObj){
     {
       fightResult = 3;
       rewardResult = "Boss Not Defated. No Reward";
-      userFightRec.waifusUsed.push(waifu.id)
+      userFightRec.waifusUsed.push(waifu.waifuId)
     }
   }
 
@@ -350,8 +384,8 @@ export async function setRealTimeListeners(userId){
     data.forEach(x => {
       var trade = x.data();
       trade.id = x.id;
-      var fromWaifus = waifus.filter(y => trade.from.waifus.includes(y.link))
-      var toWaifus = waifus.filter(y => trade.to.waifus.includes(y.link))
+      var fromWaifus = waifus.filter(y => trade.from.waifus.includes(y.waifuId))
+      var toWaifus = waifus.filter(y => trade.to.waifus.includes(y.waifuId))
 
       trade.from.waifus = fromWaifus;
       trade.to.waifus = toWaifus;
@@ -374,17 +408,39 @@ export async function setRealTimeListeners(userId){
     store.dispatch({ type: SET_WAIFU_LIST, payload: waifus });
   });
 
-  var unSubPollWaifus = firebase.firestore().collection("waifuPoll").onSnapshot(function(querySnapshot) {
+  var unSubPollWaifus = firebase.firestore().collection("waifuPoll").onSnapshot(async function(querySnapshot) {
     var poll = {
       weekly: [],
       daily: [],
     };
+
     try{
+      var userList = await firebase.firestore().collection('users').get()
+      .then((users) => {
+        var templist = [];
+  
+        users.forEach((user) => {
+          templist.push({ userId: user.id, userName: user.data().userName })
+        })
+  
+        return templist
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+
       querySnapshot.forEach(function(doc) {
-        if(doc.data().husbando == "Poll")
-          poll.weekly.push({...doc.data(), waifuId: doc.id})
+        var waifu = doc.data();
+
+        waifu.votes.forEach((vote) => {
+          var user = userList.filter(x => x.userId == vote.husbandoId)[0].userName
+          vote.husbando = user;
+        })
+
+        if(waifu.husbandoId == "Poll")
+          poll.weekly.push({...waifu, waifuId: doc.id})
         else
-          poll.daily.push({...doc.data(), waifuId: doc.id})
+          poll.daily.push({...waifu, waifuId: doc.id})
       });
 
       store.dispatch({
@@ -479,7 +535,7 @@ async function buildBossRewardStr(reward){
       case "points":
         result += `\n ${reward[x]} Points`
         user.ref.update({points: user.data().points + reward[x]})
-/*           store.dispatch({
+        /*store.dispatch({
           type: SET_SNACKBAR,
           payload: [{ type: "info", message:  `${reward[x]} Points Added` }]
         }); */
@@ -487,7 +543,7 @@ async function buildBossRewardStr(reward){
       case "statCoins":
         result += `\n ${reward[x]} Stat Coins`
         user.ref.update({statCoins: user.data().statCoins + reward[x]})
-/*           store.dispatch({
+        /*store.dispatch({
           type: SET_SNACKBAR,
           payload: [{ type: "info", message: `${reward[x]} Stat Coins Added` }]
         }); */
@@ -495,7 +551,7 @@ async function buildBossRewardStr(reward){
       case "rankCoins":
         result += `\n ${reward[x]} Rank Coins`
         user.ref.update({rankCoins: user.data().rankCoins + reward[x]})
-/*           store.dispatch({
+        /*store.dispatch({
           type: SET_SNACKBAR,
           payload: [{ type: "info", message: `${reward[x]} Rank Coins Added` }]
         }); */
@@ -504,332 +560,6 @@ async function buildBossRewardStr(reward){
   })
 
   return result;
-}
-
-export function closePoll(){
-  firebase.firestore().doc(`/poll/weekly`).update({ isActive: false })
-  .then(() => {
-      return firebase.firestore().collection("users").get()
-  })
-  .then(async data => {
-      return {users: data.docs, waifus: await firebase.firestore().collection("waifuPoll").get()}
-  })
-  .then(async (data) =>{
-      const users = []
-      data.users.forEach(x => { users.push(x.id) });
-
-      const waifus = data.waifus;
-      const ties = [];
-      const shop = [];
-      const winners = [];
-      const waifuPollUpdates = [];
-      let bonusWaifu = null;
-      
-      waifus.forEach(async (snapshot) => {
-          const waifu = snapshot.data();
-          const votes = waifu.votes;
-          if(votes.length > 0){
-              const topVotes = _.orderBy(votes, ['vote'], ['desc']);
-              const maxVote = topVotes[0].vote;
-  
-              if(votes.filter((x)  => x.vote === maxVote).length > 1){ //theres a tie
-                  if(waifu.rank === 1){//first tie so rank up and keep in poll
-                      ties.push(waifu.link); //push link so we update all these waifus rank in loop
-                      waifuPollUpdates.push({waifu: waifu.link, type: "Poll"})
-                  } 
-                  else{
-                      shop.push(waifu.link); //push link so we update all these waifus rank in loop
-                      waifuPollUpdates.push({waifu: waifu.link, type: "Shop"})
-                  }
-              }
-              else{ //no tie theres a winner
-                  const userExists = users.includes(topVotes[0].husbandoId);
-                  winners.push({
-                      husbando:  userExists ? topVotes[0].husbando : "Shop",
-                      husbandoId: userExists ? topVotes[0].husbandoId : "",
-                      waifu: waifu.link,
-                      vote: topVotes[0].vote
-                  })
-              }
-          }
-          else { //no one voted so either add to tie or shop based on rank
-              if(waifu.rank === 1) //first tie so rank up and keep in poll
-                  ties.push(waifu.link); //push link so we update all these waifus rank in loop
-              else
-                  shop.push(waifu.link); //push link so we update all these waifus rank in loop
-          }
-      })
-      
-      if(winners.length > 0){
-          const highestVote = _.orderBy(winners, ['vote'], ['desc']);
-          const maxVote = highestVote[0].vote;
-          const userExists = users.includes(highestVote[0].husbandoId);
-          const type = userExists ? "Poll" : "Shop";
-          if(highestVote.filter((x) => x.vote === maxVote).length > 1)//multiple people tied for highest vote no bonus given
-              bonusWaifu = null;
-          else{
-              bonusWaifu = highestVote[0].waifu
-              waifuPollUpdates.push({waifu: bonusWaifu, type})
-          }
-      }
-      
-      return {ties, shop, winners, bonusWaifu, waifuPollUpdates};
-      //const pollResults = await determinePoll(waifus);
-  })
-  .then(async (results) => {
-
-      await results.ties.forEach(async (x ) =>{
-          await firebase.firestore().collection("waifus").where("link", "==", x).limit(1).get()
-          .then(function(querySnapshot) {
-              querySnapshot.forEach(function(doc) {
-                  return firebase.firestore().collection("waifus").doc(doc.id).update({rank: doc.data().rank + 1});
-              });
-          })
-          .then(() => {
-              return firebase.firestore().collection('pollLogs').add({ log: `${x} Added As A Tie`, timestamp: new Date() })
-          })
-          .catch((err) => {
-              return firebase.firestore().collection('pollLogs').add({ log: err.message, timestamp: new Date() })
-          })
-      })
-
-      await results.shop.forEach(async (x ) =>{
-          await firebase.firestore().collection("waifus").where("link", "==", x).limit(1).get()
-          .then(function(querySnapshot) {
-              querySnapshot.forEach(function(doc) {
-                  console.log(doc.id, " => ", doc.data());
-                  // Build doc ref from doc.id
-                  return firebase.firestore().doc(`waifus/${doc.id}`).update({rank: doc.data().rank + 1, husbando: "Shop"});
-              });
-          })
-          .then(() => {
-              return firebase.firestore().collection('pollLogs').add({ log: `${x} Added to shop`, timestamp: new Date() })
-          })
-          .catch((err) => {
-              return firebase.firestore().collection('pollLogs').add({ log: err.message, timestamp: new Date() })
-          })
-      })
-
-      await results.winners.forEach(async (x ) => {
-          const isTopVote = (results.bonusWaifu !== null && results.bonusWaifu === x.waifu) ? true: false;
-          const husbando = x.husbando;
-          const husbandoId = x.husbandoId;
-          const waifu = x.waifu;
-
-          await firebase.firestore().collection("waifus").where("link", "==", waifu).limit(1).get()
-          .then(function(querySnapshot) {
-              querySnapshot.forEach(function(doc) {
-                  console.log(doc.id, " => ", doc.data());
-                  // Build doc ref from doc.id
-                  let rank = doc.data().rank;
-                  if(isTopVote)
-                      rank = rank + 1
-                  
-                  firebase.firestore().doc(`waifus/${doc.id}`).update({rank, husbando, husbandoId})
-                  .then(() =>{
-                      return firebase.firestore().collection("waifuPoll").where("link", "==", waifu).limit(1).get()
-                  })
-                  .catch((err) => {
-                      return firebase.firestore().collection('pollLogs').add({ log: err.message, timestamp: new Date() })
-                  })
-              });
-          })
-          .then(() => {
-              return firebase.firestore().collection('pollLogs').add({ log: `${husbando} has won ${waifu}`, timestamp: new Date() })
-          })
-          .catch((err) => {
-              return firebase.firestore().collection('pollLogs').add({ log: err.message, timestamp: new Date() })
-          })
-      })
-
-      var submitGroup = _.chain(results.winners).groupBy("husbandoId").map((value, key) => ({ id: key, user: value })).value()
-      Object.keys(submitGroup).forEach(async function(key) {
-        var husbandoId = submitGroup[key].id
-        var count = submitGroup[key].user.length;
-        var husbando = submitGroup[key].user[0].husbando;
-
-        if(husbando !== "Shop"){
-          await firebase.firestore().doc(`users/${husbandoId}`).update({ submitSlots: count })
-          .then(() => {
-            return firebase.firestore().collection("pollLogs").add({ log: `${husbando} - ${husbandoId} Submit Slots Increased `,
-              timestamp: new Date() })
-          })
-          .catch((err) => {
-            return firebase.firestore().collection("pollLogs").add({ log: "User Doesnt Exist", timestamp: new Date() })
-          })
-        }
-      });
-
-      await results.waifuPollUpdates.forEach(async (x) => {
-          await firebase.firestore().collection("waifuPoll").where("link", "==", x.waifu).limit(1).get()
-          .then((data) => {
-              data.forEach(doc => {
-                  const waifuData = doc.data();
-                  return doc.ref.update({rank: waifuData.rank + 1, husbando: x.type})
-              })
-          })
-      })
-      
-      firebase.firestore().collection("pollLogs").add({ log: results, timestamp: new Date() })
-      .catch((err) => {
-          return firebase.firestore().collection('pollLogs').add({ log: err.message, timestamp: new Date() })
-      })
-      return firebase.firestore().collection("tasks").where("worker", "==", "openPoll").limit(1).get()
-  })
-  .then((data) => {
-      if(data.empty){
-          return null
-      }
-      else{
-          const date = new Date()
-          date.setDate(date.getDate() + 1);
-          date.setHours(0,0,0,0);
-
-          return data.docs[0].ref.update({ performAt: date, status: "scheduled" })
-      }
-  })
-  .then(() => {
-      return firebase.firestore().collection("pollLogs").add({ log: "Close Poll Complete - Open Poll Set", timestamp: new Date() })
-  })
-  .catch((err) => {
-      return firebase.firestore().collection("pollLogs").add({ log: err.message, timestamp: new Date() })
-  })
-}
-
-export function openPoll(){
-  firebase.firestore().collection("waifuPoll").get()
-    .then(async (data) => {
-        data.forEach(rec => {
-            rec.ref.delete()
-            .catch((err) => {
-                return firebase.firestore().collection('pollLogs').add({ log: err.message, timestamp: new Date() })
-            })
-        })
-        
-        await firebase.firestore().collection("pollLogs").add({ log: "Delete All Current Waifus In Poll", timestamp: new Date() })
-        .catch((err) => {
-            return firebase.firestore().collection('pollLogs').add({ log: err.message, timestamp: new Date() })
-        })
-        return firebase.firestore().collection("waifus").get()
-    })
-    .then(async (waifus) => {
-        const addWaifus = [];
-        const pollWaifus = [];
-        const waifuLinks = waifus.docs.map(x => x.data().link);
-        let pollCount = waifus.docs.filter(x => x.data().husbando === "Poll").length;
-        waifus.docs.filter(x => x.data().husbando === "Poll").forEach(x => {
-            pollWaifus.push({...x.data(), waifuId: x.id});
-        })
-
-        if(pollCount < 3){
-            const url = await firebase.storage().ref('filters/SearchFile.json').getDownloadURL()
-            const returnWaifus = await fetch(url)
-            .then(response => response.json())
-            .then((jsonData) => {
-                return JSON.parse(lz.decompress(jsonData));
-            })
-            .then((data) => {
-              const characters = data.characters
-              characters['Anime-Manga'].items = characters['Anime-Manga'].items.filter(x => !waifuLinks.includes(x.link))
-              characters['Marvel'].items = characters['Marvel'].items.filter(x => !waifuLinks.includes(x.link))
-              characters['DC'].items = characters['DC'].items.filter(x => !waifuLinks.includes(x.link))
-
-                while(pollCount < 3){
-                  var randomWaifu = getRandWaifu(characters)
-                  if (addWaifus.map(x => x.link).includes(randomWaifu.link))
-                      continue;
-                  
-                  addWaifus.push(randomWaifu);
-                  pollCount = pollCount + 1
-                }
-                return firebase.firestore().collection("pollLogs").add({ log: {pollWaifus, addWaifus}, timestamp: new Date() })
-            })
-            .then(async() => {
-                return {pollWaifus, addWaifus};
-            })
-            .catch((error) => {
-                return firebase.firestore().collection('pollLogs').add({ log: error, timestamp: new Date() })
-            })
-
-            return returnWaifus;
-        }
-        else{
-            await firebase.firestore().collection("pollLogs").add({ log: {pollWaifus, addWaifus}, timestamp: new Date() })
-            .catch((err) => {
-                return firebase.firestore().collection('pollLogs').add({ log: err.message, timestamp: new Date() })
-            })
-            return {pollWaifus, addWaifus};
-        }
-    })
-    .then(async (waifus) => {
-        waifus.addWaifus.forEach(async x => {
-            x.rank = 1; //since no one voted 
-            x.attack = 1;
-            x.defense = 1;
-            x.husbando = "Poll";
-            x.husbandoId = "";
-            
-            const newWaifu = x;
-
-            await firebase.firestore().collection("waifus").add(x)
-            .then((data) => {
-                newWaifu.waifuId = data.id;
-                newWaifu.votes = [];
-                waifus.pollWaifus.push(newWaifu);
-            });
-        });
-        
-        await firebase.firestore().collection("pollLogs").add({ log: waifus.pollWaifus, timestamp: new Date() })
-        .catch((err) => {
-            return firebase.firestore().collection('pollLogs').add({ log: err.message, timestamp: new Date() })
-        })
-
-        return waifus.pollWaifus;
-    })
-    .then(async (waifus) => {
-        waifus.forEach(async x => {
-            await firebase.firestore().collection("waifuPoll").add(x);
-        });
-        return firebase.firestore().collection("users").get()
-    })
-    .then(async (users) => {
-        users.forEach(x => {
-            x.ref.update({ submitSlots: 0 })
-            .catch((err) => {
-                return firebase.firestore().collection('pollLogs').add({ log: err.message, timestamp: new Date() })
-            })
-        })
-        
-        await firebase.firestore().collection("pollLogs").add({ log: "All Submit Slots Have Been Reset", timestamp: new Date() })
-        .catch((err) => {
-            return firebase.firestore().collection('pollLogs').add({ log: err.message, timestamp: new Date() })
-        })
-        
-        const date = new Date()
-        date.setDate(date.getDate() + 6);
-        date.setHours(0,0,0,0);
-        return firebase.firestore().doc(`/poll/weekly`).update({ isActive: true, activeTill: date})
-    })
-    .then(() => {
-        return firebase.firestore().collection("tasks").where("worker", "==", "closePoll").limit(1).get()
-    })
-    .then((data) => {
-        if(data.empty)
-            return null
-        else{
-            const date = new Date()
-            date.setDate(date.getDate() + 6);
-            date.setHours(0,0,0,0);
-
-            return data.docs[0].ref.update({ performAt: date, status: "scheduled" })
-        }
-    })
-    .then(() => {
-        return firebase.firestore().collection("pollLogs").add({ log: "Poll Has Been Opened - Poll Will Close", timestamp: new Date() })
-    })
-    .catch((err) => {
-        return firebase.firestore().collection('pollLogs').add({ log: err.message, timestamp: new Date() })
-    })
 }
   
 function shuffle(array) {
@@ -872,4 +602,27 @@ function getRandWaifu(characters){
 }
 function randomNumber(min, max) {  
   return Math.ceil(Math.random() * max); 
+}
+
+function getBaseStats(rank){
+	var stats = { rank, attack: 1, defense: 1}
+	switch (rank){
+		case 1:
+			stats.attack = 3;
+			stats.defense = 1;
+			break;
+		case 2:
+			stats.attack = 7;
+			stats.defense = 5;
+			break;
+		case 3:
+			stats.attack = 12;
+			stats.defense = 10;
+			break;
+		case 4:
+			stats.attack = 20;
+			stats.defense = 15;
+			break;
+	}
+	return stats;
 }

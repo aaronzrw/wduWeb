@@ -99,14 +99,14 @@ export class Shop extends Component {
         this.state = {
             loading: true,
             userInfo: store.getState().user.credentials,
-            waifus: store.getState().data.waifuList.filter(x => x.husbando == "Shop"),
+            waifus: store.getState().data.waifuList.filter(x => x.husbandoId == "Shop"),
             card: null,
         };
 
         let dataReducerWatch = watch(store.getState, 'data')
         //let snackBarWatch = watch(store.getState, 'snackReducer')
         store.subscribe(dataReducerWatch((newVal, oldVal, objectPath) => {
-            var shopWaifus = newVal.waifuList.filter(x => x.husbando == "Shop")
+            var shopWaifus = newVal.waifuList.filter(x => x.husbandoId == "Shop")
             this.setState({ waifus: shopWaifus })
         }))
 

@@ -43,6 +43,7 @@ import Trade from './pages/trade';
 import Shop from './pages/shop';
 import Search from './pages/search';
 import Gauntlet from './pages/gauntlet';
+import Privacy from './pages/privacy';
 
 import Layout from './components/Layout';
 
@@ -107,7 +108,8 @@ class App extends Component {
               <img src={Loading} className="Loading" alt="Loading" />
             </Backdrop>
           :
-            <div style={{ height:this.state.height, width:this.state.width, position: "absolute", top: "0", left: "0" }}>                    
+            <div style={{ height:this.state.height, width:this.state.width, position: "absolute", top: "0", left: "0" }}>
+              <Route exact path="/Privacy" render={(props) => <Privacy {...props} height={height} width={width}  />}/>
               {
                 !this.state.authenticated ?
                   <LoginSignUp />

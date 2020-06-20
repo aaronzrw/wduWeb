@@ -13,6 +13,7 @@ import Fab from "@material-ui/core/Fab";
 import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardContent from "@material-ui/core/CardContent";
+import Tooltip from '@material-ui/core/Tooltip';
 
 import KeyboardBackspaceIcon from "@material-ui/icons/KeyboardBackspace";
 import CloseIcon from '@material-ui/icons/Close';
@@ -37,6 +38,11 @@ import AMCharDetails from '../components/AMCharDetails'
 import ComicCharDetails from '../components/ComicCharDetails'
 import CharacterThumbNail from '../components/CharacterThumbNail'
 
+import pointsIcon from '../media/pointsIcon.png'
+import rankCoinIcon from '../media/rankCoinIcon.png'
+import statCoinIcon from '../media/statCoinIcon.png'
+import submitSlotsIcon from '../media/submitSlotsIcon.png'
+
 
 // Redux stuff
 import watch from 'redux-watch'
@@ -52,6 +58,10 @@ const styles = (theme) => ({
   ...theme.spreadThis,
   media: {
     height: 250,
+  },
+  tooltip: {
+    fontSize: "15px",
+    maxWidth: 'none',
   },
   large: {
     width: theme.spacing(7),
@@ -223,6 +233,8 @@ class WaifuDetails extends PureComponent {
 class Trades extends PureComponent {
   render() {
     // Access the items array using the "data" prop:
+    const classes = this.props.data[3];
+
     const item = this.props.data[0][this.props.index];
     const users = [this.props.data[1]].concat(this.props.data[2]);
 
@@ -247,12 +259,52 @@ class Trades extends PureComponent {
               </Grid>
             </Grid>
             <Grid container item xs={8} style={{height:"100%"}}>
-              <Grid item xs={12} style={{height:"50px"}}>
-                <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>Points - {item.from.points}</Typography>
+              <Grid container item xs={12} justify="center" alignItems="center" style={{height:"100px"}}>
+                <Grid container justify="center" alignItems="center" tem xs={6}>
+                  <Grid item xs={4}>
+                    <Tooltip TransitionComponent={Zoom} title={"Points"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                      <img src={pointsIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>{item.from.points}</Typography>
+                  </Grid>
+                </Grid>
+                
+                <Grid container justify="center" alignItems="center" item xs={6}>
+                  <Grid item xs={4}>
+                    <Tooltip TransitionComponent={Zoom} title={"Submit Slots"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                      <img src={submitSlotsIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={8}>
+                   <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>{item.from.submitSlots}</Typography>
+                  </Grid>
+                </Grid>
+                
+                <Grid container justify="center" alignItems="center" item xs={6}>
+                  <Grid item xs={4}>
+                    <Tooltip TransitionComponent={Zoom} title={"Stat Coins"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                      <img src={statCoinIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>{item.from.statCoins}</Typography>
+                  </Grid>
+                </Grid>
+                
+                <Grid container justify="center" alignItems="center" item xs={6}>
+                  <Grid item xs={4}>
+                    <Tooltip TransitionComponent={Zoom} title={"Rank Coins"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                      <img src={rankCoinIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>{item.from.rankCoins}</Typography>
+                  </Grid>
+                </Grid>
               </Grid>
-              <Grid item xs={12} style={{height:"50px"}}>
-                <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>Submit Slots - {item.from.submitSlots}</Typography>
-              </Grid>
+
               {fromWaifus.length > 0 ?
                 <Grid item xs={12} style={{height:"calc(100% - 100px)"}}>
                   <AutoSizer>
@@ -298,12 +350,52 @@ class Trades extends PureComponent {
           {/* To */}
           <Grid container alignItems="center" justify="center" item xs={6}>
             <Grid container item xs={8} style={{height:"100%"}}>
-              <Grid item xs={12} style={{height:"50px"}}>
-                <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>Points - {item.to.points}</Typography>
+              <Grid container item xs={12} justify="center" alignItems="center" style={{height:"100px"}}>
+                <Grid container justify="center" alignItems="center" tem xs={6}>
+                  <Grid item xs={4}>
+                    <Tooltip TransitionComponent={Zoom} title={"Points"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                      <img src={pointsIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>{item.to.points}</Typography>
+                  </Grid>
+                </Grid>
+                
+                <Grid container justify="center" alignItems="center" item xs={6}>
+                  <Grid item xs={4}>
+                    <Tooltip TransitionComponent={Zoom} title={"Submit Slots"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                      <img src={submitSlotsIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={8}>
+                   <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>{item.to.submitSlots}</Typography>
+                  </Grid>
+                </Grid>
+                
+                <Grid container justify="center" alignItems="center" item xs={6}>
+                  <Grid item xs={4}>
+                    <Tooltip TransitionComponent={Zoom} title={"Stat Coins"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                      <img src={statCoinIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>{item.to.statCoins}</Typography>
+                  </Grid>
+                </Grid>
+                
+                <Grid container justify="center" alignItems="center" item xs={6}>
+                  <Grid item xs={4}>
+                    <Tooltip TransitionComponent={Zoom} title={"Rank Coins"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                      <img src={rankCoinIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>{item.to.rankCoins}</Typography>
+                  </Grid>
+                </Grid>
               </Grid>
-              <Grid item xs={12} style={{height:"50px"}}>
-                <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>Submit Slots - {item.to.submitSlots}</Typography>
-              </Grid>
+
               {toWaifus.length > 0 ?
                 <Grid item xs={12} style={{height:"calc(100% - 100px)"}}>
                   <AutoSizer>
@@ -356,6 +448,19 @@ class Trades extends PureComponent {
           
           <div style={{position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", height:"75%", width:"3px", backgroundColor:"white"}} />
           <div style={{position:"absolute", bottom:"0px", left:"50%", transform:"translate(-50%,-50%)", height:"3px", width:"75%", backgroundColor:"white"}} />
+          
+          <Grid container alignItems="center" justify="center" style={{height:"auto", position: "absolute", zIndex:10, top:"50%", left:"50%", transform:"translate(-50%,-50%)"}}>
+            <Typography 
+              style={{
+                fontFamily:"Edo",
+                fontSize:"75px",
+                textAlign:"center",
+                color: item.status == "Accepted" ? "Aqua" : "Red"
+              }}
+            >
+              {item.status}
+            </Typography>
+          </Grid>
         </Grid>
       </div>
     );
@@ -375,7 +480,7 @@ const TradeWaifus = ({ data , columnIndex, rowIndex, style }) => {
   delete cardStyle.top;
   delete cardStyle.left;
 
-  const isSelected = tradeWaifus.includes(card.link)
+  const isSelected = tradeWaifus.includes(card.waifuId)
   return (
     <div style={style}>
       <div style={{position:"absolute", zIndex:1, top:"0", right:"0", height:"25px", width:"25px"}}>
@@ -419,17 +524,21 @@ export class Trade extends Component {
       super(props);
       this.state = {
         loading: false,
-        pollIsActive: store.getState().data.poll.weekly.isActive,
+        // pollIsActive: store.getState().data.poll.weekly.isActive,
         userInfo: {...store.getState().user.credentials, waifus: store.getState().user.waifus },
         users: store.getState().user.otherUsers,
         trades: store.getState().data.trades,
         tradeFrom: {
           points: 0,
+          rankCoins: 0,
+          statCoins: 0,
           submitSlots: 0,
           waifus: []
         },
         tradeTo: {
           points: 0,
+          rankCoins: 0,
+          statCoins: 0,
           submitSlots: 0,
           waifus: []
         },
@@ -471,17 +580,17 @@ export class Trade extends Component {
       var from = this.state.tradeFrom;
       var to = this.state.tradeTo;
       if(user == "From"){
-        if(from.waifus.map(x => x).includes(waifu.link))//if already selected then remove
-          from.waifus = from.waifus.filter(x => x != waifu.link);
+        if(from.waifus.map(x => x).includes(waifu.waifuId))//if already selected then remove
+          from.waifus = from.waifus.filter(x => x != waifu.waifuId);
         else
-          from.waifus.push(waifu.link)
+          from.waifus.push(waifu.waifuId)
       }
       else{
         var to = this.state.tradeTo;
-        if(to.waifus.map(x => x).includes(waifu.link))//if already selected then remove
-          to.waifus = to.waifus.filter(x => x != waifu.link);
+        if(to.waifus.map(x => x).includes(waifu.waifuId))//if already selected then remove
+          to.waifus = to.waifus.filter(x => x != waifu.waifuId);
         else
-          to.waifus.push(waifu.link)
+          to.waifus.push(waifu.waifuId)
       }
 
       var isValid = false;
@@ -523,11 +632,15 @@ export class Trade extends Component {
       this.setState({makeTrade: false, showCharTab: false,
         tradeFrom: {
           points: 0,
+          rankCoins: 0,
+          statCoins: 0,
           submitSlots: 0,
           waifus: []
         },
         tradeTo: {
           points: 0,
+          rankCoins: 0,
+          statCoins: 0,
           submitSlots: 0,
           waifus: []
         },
@@ -674,13 +787,14 @@ export class Trade extends Component {
                                 {
                                   var data = _.cloneDeep(this.state.trades.filter(x => x.from.husbandoId == this.state.selectedUser.userId ||
                                     x.to.husbandoId == this.state.selectedUser.userId));
-
+                                  
+                                  data = _.cloneDeep(data.filter(x => x.status == "Active")).concat(data.filter(x => x.status != "Active"))
                                   return (
                                     <List
                                       outerRef={outerRef}
                                       outerElementType={CustomScrollbarsVirtualList}
                                       height={height}
-                                      itemData={[data, this.state.userInfo, this.state.users]}
+                                      itemData={[data, this.state.userInfo, this.state.users, classes]}
                                       itemCount={data.length}
                                       itemSize={350}
                                       width={width}
@@ -731,11 +845,13 @@ export class Trade extends Component {
                           
                           <Grid container item xs={12} style={{height:"calc(100% - 50px)",borderTop:"solid 3px white", borderRight:"solid 3px white"}}>
                             <Grid container item xs={12} style={{height:"50px", borderBottom:"solid 3px white"}}>
-                                <Grid container alignItems="baseline"item xs={6}>
-                                  <Grid item xs={5}>
-                                    <Typography align="center" style={{fontFamily:"Edo", fontSize:"25px", color:"white"}}>Points</Typography>
+                                <Grid container alignItems="center" justify="center" item xs={3} style={{height:"100%"}}>
+                                  <Grid item xs={2}>
+                                    <Tooltip TransitionComponent={Zoom} title={"Points"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                                      <img src={pointsIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                                    </Tooltip>
                                   </Grid>
-                                  <Grid item xs={7}>
+                                  <Grid item xs={10}>
                                     <CounterInput
                                       btnStyle={{color:"white", fontSize:"25px"}}
                                       inputStyle={{ width:"100px", fontFamily:"Edo", fontSize:"25px", color:"white" }}
@@ -748,8 +864,8 @@ export class Trade extends Component {
                                         from.points = count;
                                         
                                         var isValid = false;
-                                        if(from.points != 0 || from.submitSlots != 0 || from.waifus.length != 0)
-                                          if(to.points != 0 || to.submitSlots != 0 || to.waifus.length != 0)
+                                        if(from.points != 0 || from.submitSlots != 0 || from.waifus.length != 0 || from.rankCoins != 0 || from.statCoins != 0)
+                                          if(to.points != 0 || to.submitSlots != 0 || to.waifus.length != 0  || to.rankCoins != 0 || to.statCoins != 0)
                                             isValid = true
 
                                         this.setState({tradeFrom: from, validTrade: isValid})
@@ -757,11 +873,13 @@ export class Trade extends Component {
                                     />
                                   </Grid>
                                 </Grid>
-                                <Grid container alignItems="baseline" item xs={6}>
-                                  <Grid item xs={5}>
-                                    <Typography align="center" style={{fontFamily:"Edo", fontSize:"25px", color:"white"}}>Submit Slots</Typography>
+                                <Grid container alignItems="center" justify="center" item xs={3} style={{height:"100%"}}>
+                                  <Grid item xs={2}>
+                                    <Tooltip TransitionComponent={Zoom} title={"Submit Slots"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                                      <img src={submitSlotsIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                                    </Tooltip>
                                   </Grid>
-                                  <Grid item xs={7}>
+                                  <Grid item xs={10}>
                                     <CounterInput
                                       btnStyle={{color:"white", fontSize:"25px"}}
                                       inputStyle={{ width:"100px", fontFamily:"Edo", fontSize:"25px", color:"white" }}
@@ -772,8 +890,8 @@ export class Trade extends Component {
                                         var from = this.state.tradeFrom;
                                         var to = this.state.tradeTo;
                                         var isValid = false;
-                                        if(from.points != 0 || from.submitSlots != 0 || from.waifus.length != 0)
-                                          if(to.points != 0 || to.submitSlots != 0 || to.waifus.length != 0)
+                                        if(from.points != 0 || from.submitSlots != 0 || from.waifus.length != 0 || from.rankCoins != 0 || from.statCoins != 0)
+                                          if(to.points != 0 || to.submitSlots != 0 || to.waifus.length != 0  || to.rankCoins != 0 || to.statCoins != 0)
                                             isValid = true
 
                                         from.submitSlots = count;
@@ -782,6 +900,63 @@ export class Trade extends Component {
                                     />
                                   </Grid>
                                 </Grid>
+                              
+                                <Grid container alignItems="center" justify="center" item xs={3} style={{height:"100%"}}>
+                                  <Grid item xs={2}>
+                                    <Tooltip TransitionComponent={Zoom} title={"Stat Coins"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                                      <img src={statCoinIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                                    </Tooltip>
+                                  </Grid>
+                                  <Grid item xs={10}>
+                                    <CounterInput
+                                      btnStyle={{color:"white", fontSize:"25px"}}
+                                      inputStyle={{ width:"100px", fontFamily:"Edo", fontSize:"25px", color:"white" }}
+                                      count={this.state.tradeFrom.statCoins}
+                                      min={0}
+                                      max={this.state.userInfo.statCoins}
+                                      onCountChange={count => {
+                                        var from = this.state.tradeFrom;
+                                        var to = this.state.tradeTo;
+                                        from.statCoins = count;
+                                        
+                                        var isValid = false;
+                                        if(from.points != 0 || from.submitSlots != 0 || from.waifus.length != 0 || from.rankCoins != 0 || from.statCoins != 0)
+                                          if(to.points != 0 || to.submitSlots != 0 || to.waifus.length != 0  || to.rankCoins != 0 || to.statCoins != 0)
+                                            isValid = true
+
+                                        this.setState({tradeFrom: from, validTrade: isValid})
+                                      }}
+                                    />
+                                  </Grid>
+                                </Grid>
+                                <Grid container alignItems="center" justify="center" item xs={3} style={{height:"100%"}}>
+                                  <Grid item xs={2}>
+                                    <Tooltip TransitionComponent={Zoom} title={"Rank Coins"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                                      <img src={rankCoinIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                                    </Tooltip>
+                                  </Grid>
+                                  <Grid item xs={10}>
+                                    <CounterInput
+                                      btnStyle={{color:"white", fontSize:"25px"}}
+                                      inputStyle={{ width:"100px", fontFamily:"Edo", fontSize:"25px", color:"white" }}
+                                      count={this.state.tradeFrom.rankCoins}
+                                      min={0}
+                                      max={this.state.userInfo.rankCoins}
+                                      onCountChange={count => {
+                                        var from = this.state.tradeFrom;
+                                        var to = this.state.tradeTo;
+                                        var isValid = false;
+                                        if(from.points != 0 || from.submitSlots != 0 || from.waifus.length != 0 || from.rankCoins != 0 || from.statCoins != 0)
+                                          if(to.points != 0 || to.submitSlots != 0 || to.waifus.length != 0  || to.rankCoins != 0 || to.statCoins != 0)
+                                            isValid = true
+
+                                        from.rankCoins = count;
+                                        this.setState({tradeFrom: from, validTrade: isValid})
+                                      }}
+                                    />
+                                  </Grid>
+                                </Grid>
+                              
                               </Grid>
                               
                             <Grid item xs={12} style={{height:"calc(100% - 50px)"}}>
@@ -833,11 +1008,13 @@ export class Trade extends Component {
 
                           <Grid container item xs={12} style={{height:"calc(100% - 50px)",borderTop:"solid 3px white", borderLeft:"solid 3px white"}}>
                             <Grid container item xs={12}style={{height:"50px", borderBottom:"solid 3px white"}}>
-                              <Grid container alignItems="baseline"item xs={6}>
-                                <Grid item xs={5}>
-                                  <Typography align="center" style={{fontFamily:"Edo", fontSize:"25px", color:"white"}}>Points</Typography>
+                              <Grid container alignItems="center" justify="center" item xs={3} style={{height:"100%"}}>
+                                <Grid item xs={2}>
+                                  <Tooltip TransitionComponent={Zoom} title={"Points"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                                    <img src={pointsIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                                  </Tooltip>
                                 </Grid>
-                                <Grid item xs={7}>
+                                <Grid item xs={10}>
                                   <CounterInput
                                     btnStyle={{color:"white", fontSize:"25px"}}
                                     inputStyle={{ width:"100px", fontFamily:"Edo", fontSize:"25px", color:"white" }}
@@ -848,8 +1025,8 @@ export class Trade extends Component {
                                       var from = this.state.tradeFrom;
                                       var to = this.state.tradeTo;
                                       var isValid = false;
-                                      if(from.points != 0 || from.submitSlots != 0 || from.waifus.length != 0)
-                                        if(to.points != 0 || to.submitSlots != 0 || to.waifus.length != 0)
+                                      if(from.points != 0 || from.submitSlots != 0 || from.waifus.length != 0 || from.rankCoins != 0 || from.statCoins != 0)
+                                        if(to.points != 0 || to.submitSlots != 0 || to.waifus.length != 0  || to.rankCoins != 0 || to.statCoins != 0)
                                           isValid = true
 
                                       to.points = count;
@@ -858,11 +1035,13 @@ export class Trade extends Component {
                                   />
                                 </Grid>
                               </Grid>
-                              <Grid container alignItems="baseline" item xs={6}>
-                                <Grid item xs={5}>
-                                  <Typography align="center" style={{fontFamily:"Edo", fontSize:"25px", color:"white"}}>Submit Slots</Typography>
+                              <Grid container alignItems="center" justify="center" item xs={3} style={{height:"100%"}}>
+                                <Grid item xs={2}>
+                                  <Tooltip TransitionComponent={Zoom} title={"Submit Slots"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                                    <img src={submitSlotsIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                                  </Tooltip>
                                 </Grid>
-                                <Grid item xs={7}>
+                                <Grid item xs={10}>
                                   <CounterInput
                                     btnStyle={{color:"white", fontSize:"25px"}}
                                     inputStyle={{ width:"100px", fontFamily:"Edo", fontSize:"25px", color:"white" }}
@@ -873,11 +1052,66 @@ export class Trade extends Component {
                                       var from = this.state.tradeFrom;
                                       var to = this.state.tradeTo;
                                       var isValid = false;
-                                      if(from.points != 0 || from.submitSlots != 0 || from.waifus.length != 0)
-                                        if(to.points != 0 || to.submitSlots != 0 || to.waifus.length != 0)
+                                      if(from.points != 0 || from.submitSlots != 0 || from.waifus.length != 0 || from.rankCoins != 0 || from.statCoins != 0)
+                                        if(to.points != 0 || to.submitSlots != 0 || to.waifus.length != 0  || to.rankCoins != 0 || to.statCoins != 0)
                                           isValid = true
 
                                       to.submitSlots = count;
+                                      this.setState({tradeTo: to, validTrade: isValid})
+                                    }}
+                                  />
+                                </Grid>
+                              </Grid>
+                            
+                              <Grid container alignItems="center" justify="center" item xs={3} style={{height:"100%"}}>
+                                <Grid item xs={2}>
+                                  <Tooltip TransitionComponent={Zoom} title={"Stat Coins"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                                    <img src={statCoinIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                                  </Tooltip>
+                                </Grid>
+                                <Grid item xs={10}>
+                                  <CounterInput
+                                    btnStyle={{color:"white", fontSize:"25px"}}
+                                    inputStyle={{ width:"100px", fontFamily:"Edo", fontSize:"25px", color:"white" }}
+                                    count={this.state.tradeTo.statCoins}
+                                    min={0}
+                                    max={this.state.selectedUser.statCoins}
+                                    onCountChange={count => {
+                                      var from = this.state.tradeFrom;
+                                      var to = this.state.tradeTo;
+                                      var isValid = false;
+                                      if(from.points != 0 || from.submitSlots != 0 || from.waifus.length != 0 || from.rankCoins != 0 || from.statCoins != 0)
+                                        if(to.points != 0 || to.submitSlots != 0 || to.waifus.length != 0  || to.rankCoins != 0 || to.statCoins != 0)
+                                          isValid = true
+
+                                      to.statCoins = count;
+                                      this.setState({tradeTo: to, validTrade: isValid})
+                                    }}
+                                  />
+                                </Grid>
+                              </Grid>
+                              <Grid container alignItems="center" justify="center" item xs={3} style={{height:"100%"}}>
+                                <Grid item xs={2}>
+                                  <Tooltip TransitionComponent={Zoom} title={"Rank Coins"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                                    <img src={rankCoinIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                                  </Tooltip>
+                                </Grid>
+                                <Grid item xs={10}>
+                                  <CounterInput
+                                    btnStyle={{color:"white", fontSize:"25px"}}
+                                    inputStyle={{ width:"100px", fontFamily:"Edo", fontSize:"25px", color:"white" }}
+                                    count={this.state.tradeTo.rankCoins}
+                                    min={0}
+                                    max={this.state.selectedUser.rankCoins}
+                                    onCountChange={count => {
+                                      var from = this.state.tradeFrom;
+                                      var to = this.state.tradeTo;
+                                      var isValid = false;
+                                      if(from.points != 0 || from.submitSlots != 0 || from.waifus.length != 0 || from.rankCoins != 0 || from.statCoins != 0)
+                                        if(to.points != 0 || to.submitSlots != 0 || to.waifus.length != 0  || to.rankCoins != 0 || to.statCoins != 0)
+                                          isValid = true
+
+                                      to.rankCoins = count;
                                       this.setState({tradeTo: to, validTrade: isValid})
                                     }}
                                   />

@@ -3,9 +3,10 @@ import _ from 'lodash';
 
 import UserProfileImg from '../components/UserProfileImg'
 import CharacterThumbNail from '../components/CharacterThumbNail'
+import CounterInput from "react-counter-input";
 
 import {logoutUser} from '../redux/actions/userActions'
-import {openPoll, closePoll, updateTrade, useRankCoin, useStatCoin, updateWaifuImg} from '../redux/actions/dataActions'
+import {updateTrade, useRankCoin, useStatCoin, updateWaifuImg} from '../redux/actions/dataActions'
 
 // MUI Stuff
 import withStyles from '@material-ui/core/styles/withStyles';
@@ -45,6 +46,11 @@ import PeopleIcon from "@material-ui/icons/People";
 import LinkIcon from '@material-ui/icons/Link';
 import ImageIcon from '@material-ui/icons/Image';
 
+import pointsIcon from '../media/pointsIcon.png'
+import rankCoinIcon from '../media/rankCoinIcon.png'
+import statCoinIcon from '../media/statCoinIcon.png'
+import submitSlotsIcon from '../media/submitSlotsIcon.png'
+
 //Components
 import AMCharDetails from '../components/AMCharDetails'
 import ComicCharDetails from '../components/ComicCharDetails'
@@ -66,6 +72,10 @@ const styles = (theme) => ({
 	...theme.spreadThis,
   media: {
     height: 250,
+  },
+  tooltip: {
+    fontSize: "15px",
+    maxWidth: 'none',
   },
   large: {
     width: theme.spacing(7),
@@ -100,7 +110,8 @@ class WaifuDetails extends PureComponent {
       userInfo: props.userInfo,
       canRankUp: isUsersWaifu && props.userInfo.rankCoins > 0 && props.waifu.rank < 4,
       canStatUp: isUsersWaifu && props.userInfo.statCoins > 0,
-      stat: null,
+      atkUp: 0,
+      defUp: 0,
       updtImg: null,
       updtImgValid: false,
       showRankCoinConfirmation: false,
@@ -136,8 +147,8 @@ class WaifuDetails extends PureComponent {
     else
       this.clearCloseFunc()
   }
-  showStatConf(bool, stat){
-    this.setState({showStatCoinConfirmation: bool, stat})
+  showStatConf(bool){
+    this.setState({showStatCoinConfirmation: bool, atkUp:0, defUp:0 })
     
     if(!bool)
       this.resetCloseFunc()
@@ -216,17 +227,17 @@ class WaifuDetails extends PureComponent {
                                 style={{border:"solid 1px white", color:"white", fontFamily: "Edo",
                                   fontSize:"15px", margin:"0px 10px", height:"40px"}}
                               >
-                                Use Rank Coin
+                                Upgrade Rank
                               </Button>
                             </Grid>
 
                             <Grid container justify="center" item xs={6}>
                               <Button variant="contained" color="primary" disabled={!this.state.canStatUp}
-                                onClick={() => this.showStatConf(true, 'attack')}
+                                onClick={() => this.showStatConf(true)}
                                 style={{border:"solid 1px white", color:"white", fontFamily: "Edo",
                                   fontSize:"15px", margin:"0px 10px", height:"40px"}}
                               >
-                                Use Stat Coin
+                                Upgrade Stats
                               </Button>
                             </Grid>
                           </Grid>
@@ -275,23 +286,59 @@ class WaifuDetails extends PureComponent {
                 this.state.showStatCoinConfirmation ?
                 <Dialog
                   open={this.state.showStatCoinConfirmation}
-                  onClose={this.showStatConf(false)}
+                  onClose={() => this.showStatConf(false)}
                 >
-                  <DialogTitle id="alert-dialog-title">{"Use Stat Coin?"}</DialogTitle>
+                  <DialogTitle id="alert-dialog-title">Upgrade Stats - {this.state.userInfo.statCoins - (this.state.atkUp + this.state.defUp)}</DialogTitle>
                   <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                      Your About To Use A Stat Coin.
-                    </DialogContentText>
+                    <Grid container style={{height:'100%'}}>
+                      <Grid container alignItems="center" justify="center" item xs={6}>
+                        <Typography
+                          style={{
+                            fontSize: 65,
+                            fontFamily: "TarrgetLaser",
+                            textAlign: "center",
+                          }}
+                        >
+                          ATK
+                        </Typography>
+                        <CounterInput
+                          inputStyle={{ width:"100px", fontFamily:"Edo" }}
+                          count={this.state.atkUp}
+                          min={0}
+                          max={this.state.userInfo.statCoins - this.state.defUp}
+                          onCountChange={count => { this.setState({atkUp: count}) }}
+                        />
+                      </Grid>
+
+                      <Grid container alignItems="center" justify="center" item xs={6}>
+                        <Typography
+                          style={{
+                            fontSize: 65,
+                            fontFamily: "TarrgetLaser",
+                            textAlign: "center",
+                          }}
+                        >
+                          DEF
+                        </Typography>
+                        <CounterInput
+                          inputStyle={{ width:"100px", fontFamily:"Edo" }}
+                          count={this.state.defUp}
+                          min={0}
+                          max={this.state.userInfo.statCoins - this.state.atkUp}
+                          onCountChange={count => { this.setState({defUp: count}) }}
+                        />
+
+                      </Grid>
+                    </Grid>
                   </DialogContent>
                   <DialogActions>
-                    <Button onClick={() => this.showStatConf(false, null)} color="primary">
+                    <Button onClick={() => this.showStatConf(false)} color="primary">
                       Cancel
                     </Button>
                     <Button 
                       onClick={() => {
-                        var stat = _.cloneDeep(this.state.stat)
-                        this.showStatConf(false, null)
-                        useStatCoin(this.state.card, stat)
+                        useStatCoin(this.state.card, {attack: this.state.atkUp, defense: this.state.defUp})
+                        this.showStatConf(false)
                       }} color="primary" autoFocus
                     >
                       Confirm
@@ -352,6 +399,8 @@ const UserWaifus = ({ data , columnIndex, rowIndex, style }) => {
 class Trades extends PureComponent {
   render() {
     // Access the items array using the "data" prop:
+    const classes = this.props.data[4];
+
     const item = this.props.data[0][this.props.index];
 		const isToUser = item.to.husbandoId == store.getState().user.credentials.userId;
     const users = [this.props.data[2]].concat(this.props.data[3]);
@@ -369,9 +418,10 @@ class Trades extends PureComponent {
 		var canAccept = false;
 		if(item.from.points <= fromUser.points && item.from.submitSlots <= fromUser.submitSlots &&
 			item.to.points <= toUser.points && item.to.submitSlots <= toUser.submitSlots){
-				var tt = _.difference(fromWaifus.map(x => x.link), fromUser.waifus.map(x => x.link)).length;
-				var te = _.difference(toWaifus.map(x => x.link), toUser.waifus.map(x => x.link)).length;
-				canAccept = tt == 0 && te == 0 && !store.getState().data.poll.weekly.isActive;
+				var tt = _.difference(fromWaifus.map(x => x.waifuId), fromUser.waifus.map(x => x.waifuId)).length;
+				var te = _.difference(toWaifus.map(x => x.waifuId), toUser.waifus.map(x => x.waifuId)).length;
+				canAccept = tt == 0 && te == 0;
+				// canAccept = tt == 0 && te == 0 && !store.getState().data.poll.weekly.isActive;
 		}
 
     return (
@@ -388,12 +438,52 @@ class Trades extends PureComponent {
               </Grid>
             </Grid>
             <Grid container item xs={8} style={{height:"100%"}}>
-              <Grid item xs={12} style={{height:"50px"}}>
-                <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>Points - {item.from.points}</Typography>
+              <Grid container item xs={12} justify="center" alignItems="center" style={{height:"100px"}}>
+                <Grid container justify="center" alignItems="center" tem xs={6}>
+                  <Grid item xs={4}>
+                    <Tooltip TransitionComponent={Zoom} title={"Points"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                      <img src={pointsIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>{item.from.points}</Typography>
+                  </Grid>
+                </Grid>
+                
+                <Grid container justify="center" alignItems="center" item xs={6}>
+                  <Grid item xs={4}>
+                    <Tooltip TransitionComponent={Zoom} title={"Points"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                      <img src={submitSlotsIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={8}>
+                   <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>{item.from.submitSlots}</Typography>
+                  </Grid>
+                </Grid>
+                
+                <Grid container justify="center" alignItems="center" item xs={6}>
+                  <Grid item xs={4}>
+                    <Tooltip TransitionComponent={Zoom} title={"Points"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                      <img src={statCoinIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>{item.from.statCoins}</Typography>
+                  </Grid>
+                </Grid>
+                
+                <Grid container justify="center" alignItems="center" item xs={6}>
+                  <Grid item xs={4}>
+                    <Tooltip TransitionComponent={Zoom} title={"Points"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                      <img src={rankCoinIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>{item.from.rankCoins}</Typography>
+                  </Grid>
+                </Grid>
               </Grid>
-              <Grid item xs={12} style={{height:"50px"}}>
-                <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>Submit Slots - {item.from.submitSlots}</Typography>
-              </Grid>
+
               <Grid item xs={12} style={{height:"calc(100% - 100px)"}}>
                 <AutoSizer>
                   {({height, width}) =>
@@ -437,12 +527,52 @@ class Trades extends PureComponent {
           {/* To */}
           <Grid container alignItems="center" justify="center" item xs={6}>
             <Grid container item xs={8} style={{height:"100%"}}>
-              <Grid item xs={12} style={{height:"50px"}}>
-                <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>Points - {item.to.points}</Typography>
+              <Grid container item xs={12} justify="center" alignItems="center" style={{height:"100px"}}>
+                <Grid container justify="center" alignItems="center" tem xs={6}>
+                  <Grid item xs={4}>
+                    <Tooltip TransitionComponent={Zoom} title={"Points"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                      <img src={pointsIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>{item.to.points}</Typography>
+                  </Grid>
+                </Grid>
+                
+                <Grid container justify="center" alignItems="center" item xs={6}>
+                  <Grid item xs={4}>
+                    <Tooltip TransitionComponent={Zoom} title={"Points"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                      <img src={submitSlotsIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={8}>
+                   <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>{item.to.submitSlots}</Typography>
+                  </Grid>
+                </Grid>
+                
+                <Grid container justify="center" alignItems="center" item xs={6}>
+                  <Grid item xs={4}>
+                    <Tooltip TransitionComponent={Zoom} title={"Points"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                      <img src={statCoinIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>{item.to.statCoins}</Typography>
+                  </Grid>
+                </Grid>
+                
+                <Grid container justify="center" alignItems="center" item xs={6}>
+                  <Grid item xs={4}>
+                    <Tooltip TransitionComponent={Zoom} title={"Points"} placement="top" classes={{ tooltip: classes.tooltip }}>
+                      <img src={rankCoinIcon} style={{height:35, width:35, filter:"invert(100%)"}}/>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>{item.to.rankCoins}</Typography>
+                  </Grid>
+                </Grid>
               </Grid>
-              <Grid item xs={12} style={{height:"50px"}}>
-                <Typography style={{color:"white", fontFamily:"Edo", fontSize:"35px", textAlign:"center"}}>Submit Slots - {item.to.submitSlots}</Typography>
-              </Grid>
+              
               <Grid item xs={12} style={{height:"calc(100% - 100px)"}}>
                 <AutoSizer>
                   {({height, width}) =>
@@ -511,6 +641,19 @@ class Trades extends PureComponent {
               <></>
             }
 					</div>
+
+          <Grid container alignItems="center" justify="center" style={{height:"auto", position: "absolute", zIndex:10, top:"50%", left:"50%", transform:"translate(-50%,-50%)"}}>
+            <Typography 
+              style={{
+                fontFamily:"Edo",
+                fontSize:"75px",
+                textAlign:"center",
+                color: item.status == "Accepted" ? "Aqua" : "Red"
+              }}
+            >
+              {item.status}
+            </Typography>
+          </Grid>
         </Grid>
       </div>
     );
@@ -561,8 +704,6 @@ class Profile extends Component {
 		};
 
     this.selectedCard = this.selectedCard.bind(this);
-    // this.updateEmail = this.updateEmail.bind(this);
-    // this.updateEmail = this.updateEmail.bind(this);
 
 		let dataReducerWatch = watch(store.getState, 'data')
 		let userReducerWatch = watch(store.getState, 'user')
@@ -587,7 +728,6 @@ class Profile extends Component {
 
 			this.setState({userInfo: {...newVal.credentials, waifus: newVal.waifus }, selectedWaifu, users: newVal.otherUsers })
 		}))
-
 	}
 
 	componentDidMount(){
@@ -630,8 +770,6 @@ class Profile extends Component {
 
               <Grid container alignItems="center" justify="center" item xs={12} style={{height:"50px"}}>
                 <Button variant="contained" color="primary" onClick={logoutUser} style={{fontFamily: "Edo", fontSize:"15px", height:""}}>LogOut</Button>
-                {this.state.userInfo.isAdmin ?<Button variant="contained" color="primary" onClick={closePoll} style={{fontFamily: "Edo", fontSize:"15px", height:""}}>closePoll</Button>:<></>}
-                {this.state.userInfo.isAdmin ?<Button variant="contained" color="primary" onClick={openPoll} style={{fontFamily: "Edo", fontSize:"15px", height:""}}>openPoll</Button>:<></>}								
               </Grid>
             </Grid>
           </Grid>
@@ -691,12 +829,13 @@ class Profile extends Component {
                   {
                     var data = _.cloneDeep(this.state.trades);
 
+                    data = _.cloneDeep(data.filter(x => x.status == "Active")).concat(data.filter(x => x.status != "Active"))
                     return (
                       <List
                         outerRef={outerRef}
                         outerElementType={CustomScrollbarsVirtualList}
                         height={height}
-                        itemData={[data, this.selectedCard, this.state.userInfo, this.state.users]}
+                        itemData={[data, this.selectedCard, this.state.userInfo, this.state.users, classes]}
                         itemCount={data.length}
                         itemSize={350}
                         width={width}

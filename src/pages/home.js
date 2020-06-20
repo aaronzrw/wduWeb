@@ -139,6 +139,7 @@ class Home extends Component {
 			dailyPoll: store.getState().data.poll.daily,
 			weeklyPollWaifus: store.getState().data.weeklyPollWaifus,
 			dailyPollWaifus: store.getState().data.dailyPollWaifus,
+			otherUsers: store.getState().user.otherUsers,
 			voteCount: 0,
 		};
 		
@@ -154,8 +155,9 @@ class Home extends Component {
 
 		store.subscribe(dataReducerWatch((newVal, oldVal, objectPath) => {
 			this.setState({ ...newVal, weeklyPoll: newVal.poll.weekly, dailyPoll: newVal.poll.daily, })
+			
 			if(this.state.card != null){
-				if(this.state.card.husbando == "Poll")
+				if(this.state.card.husbandoId == "Poll")
 					this.showWeeklyCardDetails(newVal.weeklyPollWaifus.filter(x => x.waifuId == this.state.card.waifuId)[0])
 				else
 					this.showDailyCardDetails(newVal.dailyPollWaifus.filter(x => x.waifuId == this.state.card.waifuId)[0])
@@ -169,6 +171,8 @@ class Home extends Component {
 
 	componentDidMount(){
 	}
+
+
 
 	showWeeklyCardDetails(card){
 		var topVote = {vote: "None", img: "https://booking.lofoten.info/en//Content/img/missingimage.jpg"}
@@ -262,8 +266,9 @@ class Home extends Component {
 												var maxVote = votes[0].vote;
 												if(votes.filter(x => x.vote == maxVote).length > 1)
 													topVote = {husbando:"TIE", vote: maxVote, img: "https://booking.lofoten.info/en//Content/img/missingimage.jpg"}
-												else
+												else{
 													topVote = votes[0]
+												}
 											}
 
 											var timeout = (index+1) * 500
@@ -341,6 +346,9 @@ class Home extends Component {
 										var votes = _.orderBy(item.votes, ['vote'] ,['desc']);
 										currUserVote = votes.filter(x => x.husbandoId == this.state.userInfo.userId);
 										currUserVote = _.isEmpty(currUserVote.length) ? null : currUserVote[0];
+
+										if(currUserVote != null)
+											currUserVote.husbando = this.state.userInfo.userName
 
 										var timeout = (index+1) * 500
 										return(
