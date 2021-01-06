@@ -12,7 +12,7 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "@version/react-router-v3": "^1.0.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "cors": "^2.8.5",
     "countdown": "^2.6.0",
     "dayjs": "^1.8.23",
